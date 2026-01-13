@@ -1,17 +1,19 @@
 <div class="destaque-wrapper">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <meta property="og:title" content="AniGeekNews - Manchetes">
-  <meta property="og:description" content="As principais notícias e destaques do mundo geek.">
+  <meta property="og:title" content="AniGeekNews - Podcasts">
+  <meta property="og:description" content="Ouça e assista aos nossos episódios sobre a cultura geek.">
 
   <div id="notificacao-novo-artigo">
     <i class="fa-solid fa-bell-concierge"></i>
     <div>
-      <div style="font-size: 11px; font-weight: 800; opacity: 0.8; text-transform: uppercase;">Novo no site!</div>
-      <div id="novo-artigo-titulo" style="font-size: 14px; font-weight: 700;">Carregando título...</div>
+      <div style="font-size: 11px; font-weight: 800; opacity: 0.8; text-transform: uppercase;">Último Episódio</div>
+      <div id="novo-artigo-titulo" style="font-size: 14px; font-weight: 700;">Carregando...</div>
     </div>
   </div>
 
-  <div id="container-principal"></div>
+  <div id="container-principal">
+    <div style="text-align: center; padding: 50px; color: #666;">Buscando podcasts...</div>
+  </div>
 
   <div id="notificacao-video">
     <div style="flex: 1;">
@@ -53,31 +55,18 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    function limparEspacos(url) {
-      return url ? url.trim() : url;
-    }
+    let playerAlvo = '';
+    let urlAlvo = '';
 
-    const meuFeedNoticias = [
-      {
-        id: "onepiece",
-        cor: "#e63946",
-        categoria: "Análise Técnica",
-        titulo: "Por que Egghead é o melhor arco de One Piece em décadas",
-        resumo: "Uma análise profunda sobre a mudança estética da Toei Animation e o impacto da direção de arte de Sota Shigeshita.",
-        linkArtigo: "#",
-        ficha: [{ label: "Estúdio", valor: "Toei Animation" }, { label: "Direção", valor: "Sota Shigeshita" }, { label: "Analista", valor: "Gustavo Lima" }],
-        videoPrincipal: "https://www.youtube.com/embed/uJMdqWHlnD4",
-        relacionados: [
-          { idVid: "uJMdqWHlnD4", titulo: "EGGHEAD SE TORNOU O MELHOR ARCO!", thumb: "https://img.youtube.com/vi/uJMdqWHlnD4/mqdefault.jpg" }
-        ]
-      }
-    ];
+    function limparEspacos(url) {
+      return url ? url.trim() : '';
+    }
 
     window.shareNews = (titulo, url) => {
       if (navigator.share) {
         navigator.share({ title: titulo, url }).catch(console.error);
       } else {
-        alert("Seu navegador não suporta Web Share. Use 'Copiar Link'.");
+        window.copiarLink(url);
       }
     };
 
@@ -98,6 +87,7 @@
 
     window.pedirTroca = (idPlayer, idVideo, titulo, cor) => {
       playerAlvo = idPlayer;
+      // Link de incorporação dinâmico do YouTube
       urlAlvo = `https://www.youtube.com/embed/${idVideo}?autoplay=1`;
       const notif = document.getElementById('notificacao-video');
       document.getElementById('notif-titulo').innerText = titulo;
@@ -108,9 +98,6 @@
     window.fecharNotif = () => {
       document.getElementById('notificacao-video').classList.remove('visivel');
     };
-
-    let playerAlvo = '';
-    let urlAlvo = '';
 
     const btnConfirmar = document.getElementById('btn-confirmar');
     if(btnConfirmar) {
@@ -132,21 +119,17 @@
         return `
         <article class="destaque-secao" id="artigo-${news.id}" style="--tema-cor: ${news.cor}">
           <div class="destaque-padding">
-            <div class="destaque-categoria"><i class="fa-solid fa-video"></i> ${news.categoria}</div>
+            <div class="destaque-categoria"><i class="fa-solid fa-microphone-lines"></i> ${news.categoria}</div>
             <div class="destaque-header">
               <h2 class="destaque-titulo">${news.titulo}</h2>
-              <div class="menu-opcoes-container" tabindex="0">
-                <button class="btn-tres-pontos"><i class="fa-solid fa-ellipsis"></i></button>
-                <div class="dropdown-conteudo header-dropdown">
-                  <a href="#"><i class="fa-regular fa-bookmark"></i> Salvar</a>
-                  <a href="#" onclick="event.preventDefault(); window.copiarLink('${shareUrl}');"><i class="fa-regular fa-copy"></i> Copiar Link</a>
-                </div>
-              </div>
+              <button class="btn-tres-pontos" onclick="window.copiarLink('${shareUrl}')">
+                <i class="fa-solid fa-link"></i>
+              </button>
             </div>
             <p class="destaque-resumo">${news.resumo}</p>
-            <a href="${news.linkArtigo}" class="btn-ver-artigo"><i class="fa-solid fa-book-open"></i> Ver artigo completo</a>
+            <a href="${news.linkArtigo}" target="_blank" class="btn-ver-artigo"><i class="fa-solid fa-book-open"></i> Ver postagem</a>
             <div class="destaque-info-grid">
-              ${news.ficha.map(item => `<div class="info-item"><span class="info-label">${item.label}</span><span class="info-valor">${item.valor}</span></div>`).join('')}
+              ${news.ficha ? news.ficha.map(item => `<div class="info-item"><span class="info-label">${item.label}</span><span class="info-valor">${item.valor}</span></div>`).join('') : ''}
             </div>
           </div>
           <div class="destaque-media">
@@ -173,14 +156,21 @@
     }
 
     function carregarTudoRealTime() {
+      // Conecta à coleção podcast
       const q = collection(db, "podcast");
+      
       onSnapshot(q, (snapshot) => {
         const noticiasFB = [];
         snapshot.forEach((doc) => {
-          const data = doc.data();
-          noticiasFB.push({ id: doc.id, ...data });
+          noticiasFB.push({ id: doc.id, ...doc.data() });
         });
-        renderizarNoticias([...meuFeedNoticias, ...noticiasFB]);
+
+        if (noticiasFB.length === 0) {
+            document.getElementById('container-principal').innerHTML = "<p style='text-align:center; padding:30px;'>Nenhum podcast encontrado.</p>";
+        } else {
+            renderizarNoticias(noticiasFB);
+            document.getElementById('novo-artigo-titulo').innerText = noticiasFB[0].titulo;
+        }
       });
     }
 

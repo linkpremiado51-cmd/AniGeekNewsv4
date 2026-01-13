@@ -1,19 +1,19 @@
 <div class="destaque-wrapper">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <meta property="og:title" content="AniGeekNews - Lançamentos">
-  <meta property="og:description" content="Confira os últimos lançamentos do mundo geek.">
+  <meta property="og:title" content="AniGeekNews - Análises">
+  <meta property="og:description" content="Análises profundas e técnicas sobre o mundo geek.">
 
   <div id="notificacao-novo-artigo">
     <i class="fa-solid fa-bell-concierge"></i>
     <div>
-      <div style="font-size: 11px; font-weight: 800; opacity: 0.8; text-transform: uppercase;">Último Lançamento</div>
-      <div id="novo-artigo-titulo" style="font-size: 14px; font-weight: 700;">Carregando...</div>
+      <div style="font-size: 11px; font-weight: 800; opacity: 0.8; text-transform: uppercase;">Novo no site!</div>
+      <div id="novo-artigo-titulo" style="font-size: 14px; font-weight: 700;">Carregando Título...</div>
     </div>
   </div>
 
   <div id="container-principal">
-    <div style="text-align: center; padding: 50px; color: #666; font-family: sans-serif;">
-        <p>Carregando lançamentos...</p>
+    <div style="text-align: center; padding: 50px; color: #666;">
+        <p>Carregando análises...</p>
     </div>
   </div>
 
@@ -27,6 +27,18 @@
   </div>
 
   <div id="toast-copiado">Link copiado!</div>
+
+  <div id="modal-noticia">
+    <div id="modal-conteudo">
+      <button id="modal-fechar" onclick="window.fecharModal()">×</button>
+      <div id="modal-titulo" class="destaque-titulo" style="margin-top: 0;"></div>
+      <div id="modal-categoria" class="destaque-categoria"></div>
+      <p id="modal-resumo" class="destaque-resumo"></p>
+      <a id="modal-link" class="btn-ver-artigo"><i class="fa-solid fa-book-open"></i> Ver artigo completo</a>
+      <div id="modal-ficha" class="destaque-info-grid"></div>
+      <iframe id="modal-video" allowfullscreen></iframe>
+    </div>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -45,6 +57,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // Variáveis globais para o sistema de troca de vídeo
     let playerAlvo = '';
     let urlAlvo = '';
 
@@ -52,6 +65,7 @@
       return url ? url.trim() : '';
     }
 
+    // Sistema de Compartilhamento
     window.shareNews = (titulo, url) => {
       if (navigator.share) {
         navigator.share({ title: titulo, url }).catch(console.error);
@@ -71,9 +85,16 @@
       }
     };
 
+    window.fecharModal = () => {
+      document.getElementById('modal-noticia').style.display = 'none';
+    };
+
+    // Sistema de Troca de Vídeo via Carrossel
     window.pedirTroca = (idPlayer, idVideo, titulo, cor) => {
       playerAlvo = idPlayer;
+      // Gera o link de embed correto do YouTube
       urlAlvo = `https://www.youtube.com/embed/${idVideo}?autoplay=1`;
+      
       const notif = document.getElementById('notificacao-video');
       document.getElementById('notif-titulo').innerText = titulo;
       notif.style.setProperty('--notif-cor', cor);
@@ -84,6 +105,7 @@
       document.getElementById('notificacao-video').classList.remove('visivel');
     };
 
+    // Botão Confirmar Troca de Vídeo
     const btnConfirmar = document.getElementById('btn-confirmar');
     if(btnConfirmar) {
         btnConfirmar.onclick = () => {
@@ -93,6 +115,7 @@
         };
     }
 
+    // Renderização das Notícias
     function renderizarNoticias(listaCompleta) {
       const container = document.getElementById('container-principal');
       if (!container) return;
@@ -104,27 +127,38 @@
         return `
         <article class="destaque-secao" id="artigo-${news.id}" style="--tema-cor: ${news.cor}">
           <div class="destaque-padding">
-            <div class="destaque-categoria"><i class="fa-solid fa-rocket"></i> ${news.categoria}</div>
+            <div class="destaque-categoria"><i class="fa-solid fa-microchip"></i> ${news.categoria}</div>
             <div class="destaque-header">
               <h2 class="destaque-titulo">${news.titulo}</h2>
-              <button class="btn-tres-pontos" onclick="window.copiarLink('${shareUrl}')">
-                <i class="fa-solid fa-link"></i>
-              </button>
+              <div class="menu-opcoes-container" tabindex="0">
+                <button class="btn-tres-pontos"><i class="fa-solid fa-ellipsis"></i></button>
+                <div class="dropdown-conteudo header-dropdown">
+                  <a href="#" onclick="event.preventDefault(); window.copiarLink('${shareUrl}');"><i class="fa-regular fa-copy"></i> Copiar Link</a>
+                </div>
+              </div>
             </div>
             <p class="destaque-resumo">${news.resumo}</p>
-            <a href="${news.linkArtigo}" target="_blank" class="btn-ver-artigo"><i class="fa-solid fa-book-open"></i> Ver detalhes</a>
+            <a href="${news.linkArtigo}" target="_blank" class="btn-ver-artigo"><i class="fa-solid fa-book-open"></i> Ver artigo completo</a>
+            
             <div class="destaque-info-grid">
-              ${news.ficha ? news.ficha.map(item => `<div class="info-item"><span class="info-label">${item.label}</span><span class="info-valor">${item.valor}</span></div>`).join('') : ''}
+              ${news.ficha ? news.ficha.map(item => `
+                <div class="info-item">
+                  <span class="info-label">${item.label}</span>
+                  <span class="info-valor">${item.valor}</span>
+                </div>`).join('') : ''}
             </div>
           </div>
+
           <div class="destaque-media">
             <iframe id="player-${news.id}" src="${limparEspacos(news.videoPrincipal)}" allowfullscreen></iframe>
           </div>
+
           <div class="destaque-acoes">
               <button class="btn-acao" onclick="event.preventDefault(); window.shareNews('${news.titulo.replace(/'/g, "\\'")}', '${shareUrl}')">
                 <i class="fa-solid fa-share-nodes"></i> Compartilhar
               </button>
           </div>
+
           <div class="carrossel-temas">
             <div class="carrossel-header"><span class="temas-label">Vídeos Relacionados</span></div>
             <div class="temas-scroll-wrapper">
@@ -142,28 +176,31 @@
       }).join('');
     }
 
+    // Carregamento em Tempo Real
     function carregarTudoRealTime() {
-      // Conectando especificamente à coleção "lancamentos"
+      // ATENÇÃO: Conectando à coleção específica "analises"
       const q = collection(db, "lancamentos");
       
       onSnapshot(q, (snapshot) => {
         const noticiasFB = [];
         snapshot.forEach((doc) => {
-          noticiasFB.push({ id: doc.id, ...doc.data() });
+          const data = doc.data();
+          noticiasFB.push({ id: doc.id, ...data });
         });
 
         if (noticiasFB.length === 0) {
             document.getElementById('container-principal').innerHTML = `
                 <div style="text-align: center; padding: 50px; color: #666; font-family: sans-serif;">
                     <i class="fa-solid fa-box-open" style="font-size: 30px; opacity: 0.3;"></i>
-                    <p>Nenhum lançamento cadastrado ainda.</p>
+                    <p>Ainda não há análises publicadas.</p>
                 </div>`;
         } else {
             renderizarNoticias(noticiasFB);
+            // Atualiza a notificação do topo com o título da análise mais recente
             document.getElementById('novo-artigo-titulo').innerText = noticiasFB[0].titulo;
         }
       }, (error) => {
-          console.error("Erro no Firebase Lançamentos:", error);
+          console.error("Erro ao carregar do Firebase:", error);
           document.getElementById('container-principal').innerHTML = "<p>Erro ao conectar com o banco de dados.</p>";
       });
     }

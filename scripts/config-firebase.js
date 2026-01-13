@@ -1,6 +1,6 @@
 /* scripts/config-firebase.js */
 
-// Importações do SDK do Firebase via CDN
+// Importações Do SDK do Firebase via CDN
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 

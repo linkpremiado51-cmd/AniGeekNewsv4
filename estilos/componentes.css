@@ -1,0 +1,209 @@
+/* --- BARRA DE BUSCA (SEARCH BAR) --- */
+.search-bar-wrapper {
+    max-width: var(--container-w);
+    margin: 0 auto;
+    padding: 10px 20px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+}
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: var(--nyt-gray-light);
+    border-radius: 4px;
+    padding: 5px 15px;
+    transition: 0.3s;
+}
+
+body.dark-mode .search-box { 
+    background: #222; 
+}
+
+.search-box:focus-within {
+    background: var(--card-bg);
+    box-shadow: 0 0 0 1px var(--primary);
+}
+
+.search-box i { 
+    color: var(--text-muted); 
+    font-size: 14px; 
+}
+
+.search-box input {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 8px 10px;
+    font-size: 14px;
+    color: var(--text-main);
+    outline: none;
+}
+
+/* --- SUPERFÍCIE DE RESULTADOS DA BUSCA --- */
+#search-results-surface {
+    position: absolute;
+    top: 100%;
+    left: 20px;
+    right: 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-top: none;
+    z-index: 2000;
+    display: none;
+    max-height: 500px;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.result-item-list {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border);
+    gap: 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.result-item-list:hover { 
+    background: rgba(0,0,0,0.03); 
+}
+
+body.dark-mode .result-item-list:hover { 
+    background: rgba(255,255,255,0.05); 
+}
+
+.result-img {
+    width: 100px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 2px;
+    background: #eee;
+}
+
+.result-info { 
+    flex: 1; 
+}
+
+.result-cat { 
+    font-size: 9px; 
+    font-weight: 800; 
+    text-transform: uppercase; 
+    color: var(--primary); 
+    letter-spacing: 1px; 
+}
+
+.result-title { 
+    font-size: 14px; 
+    font-weight: 700; 
+    color: var(--text-main); 
+    line-height: 1.2; 
+    margin: 2px 0; 
+}
+
+/* --- FILTROS (FILTER SCROLLER) --- */
+.filter-scroller {
+    max-width: var(--container-w);
+    margin: 0 auto;
+    padding: 15px 20px;
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+}
+
+.filter-tag { 
+    font-family: var(--font-sans); 
+    font-size: 13px; 
+    font-weight: 600; 
+    color: var(--text-muted); 
+    cursor: pointer; 
+    background: none; 
+    border: none; 
+    padding-bottom: 5px;
+    white-space: nowrap;
+}
+
+.filter-tag.active { 
+    color: var(--text-main); 
+    text-decoration: underline; 
+    text-underline-offset: 4px; 
+}
+
+/* --- NEWSLETTER E CONTEÚDO --- */
+.hero { 
+    max-width: var(--container-w); 
+    margin: 40px auto; 
+    padding: 0 20px; 
+    border-bottom: 1px solid var(--border); 
+    padding-bottom: 40px; 
+    min-height: 300px; 
+}
+
+.newsletter-card { 
+    background: #f5f5f5; 
+    padding: 30px 20px; 
+    text-align: left; 
+    margin: 40px auto; 
+    max-width: var(--container-w); 
+}
+
+body.dark-mode .newsletter-card { 
+    background: #222; 
+}
+
+/* --- TEMA (TOGGLE SWITCH NO MENU) --- */
+.theme-toggle-container { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 8px 0; 
+}
+
+.theme-toggle { 
+    position: relative; 
+    display: inline-block; 
+    width: 40px; 
+    height: 20px; 
+}
+
+.theme-toggle input { 
+    opacity: 0; 
+    width: 0; 
+    height: 0; 
+}
+
+.slider { 
+    position: absolute; 
+    cursor: pointer; 
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    bottom: 0; 
+    background-color: var(--nyt-gray-light); 
+    transition: 0.4s; 
+    border-radius: 34px; 
+}
+
+.slider:before { 
+    position: absolute; 
+    content: ""; 
+    height: 16px; 
+    width: 16px; 
+    left: 2px; 
+    bottom: 2px; 
+    background-color: white; 
+    transition: 0.4s; 
+    border-radius: 50%; 
+}
+
+input:checked + .slider { 
+    background-color: var(--accent-news); 
+}
+
+input:checked + .slider:before { 
+    transform: translateX(20px); 
+}

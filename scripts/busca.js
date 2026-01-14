@@ -18,11 +18,11 @@ function renderizarSuperficie(lista) {
             const thumb = news.thumb || (news.relacionados && news.relacionados[0] ? news.relacionados[0].thumb : 'https://anigeeknews.com/default-og.jpg');
             
             return `
-            <div class="result-item-list" onclick="window.focarNoticia('${news.id}')" style="cursor:pointer;">
-                <img src="${thumb}" class="result-img" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
+            <div class="result-item-list" onclick="window.focarNoticia('${news.id}')" style="cursor:pointer; display:flex; align-items:center; gap:10px; padding:10px; border-bottom:1px solid rgba(0,0,0,0.05);">
+                <img src="${thumb}" class="result-img" style="width:50px; height:50px; object-fit:cover; border-radius:4px; flex-shrink:0;">
                 <div class="result-info">
-                    <div class="result-cat" style="color: ${news.cor || 'var(--primary)'}; font-size:10px; font-weight:800; text-transform:uppercase;">${news.categoria}</div>
-                    <h4 class="result-title" style="margin:0; font-size:13px; color:var(--text-main);">${news.titulo}</h4>
+                    <div class="result-cat" style="color: ${news.cor || 'var(--primary)'}; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">${news.categoria}</div>
+                    <h4 class="result-title" style="margin:2px 0 0 0; font-size:13px; font-weight:700; color:var(--text-main); line-height:1.2;">${news.titulo}</h4>
                 </div>
             </div>`;
         }).join('');
@@ -42,7 +42,7 @@ if (inputBusca) {
             return; 
         }
 
-        // Filtra a lista centralizada pelo config-firebase.js
+        // Filtra a lista centralizada pelo config-firebase.js que contém todas as coleções
         const filtradas = (window.noticiasFirebase || []).filter(n => 
             (n.titulo && n.titulo.toLowerCase().includes(termo)) || 
             (n.categoria && n.categoria.toLowerCase().includes(termo)) ||
@@ -57,22 +57,24 @@ if (inputBusca) {
  * Função chamada ao clicar em um resultado da busca
  */
 window.focarNoticia = (id) => {
+    // 1. Limpa a interface de busca
     if (surface) surface.style.display = 'none';
     if (inputBusca) inputBusca.value = "";
     
+    // 2. Localiza a notícia no banco de dados global já carregado
     const noticia = (window.noticiasFirebase || []).find(n => n.id === id);
     
     if (noticia) {
-        // 1. Se a função de renderizar já existir (estamos na seção certa), usamos ela
-        if (typeof window.renderizarNoticias === 'function') {
-            window.renderizarNoticias([noticia]);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        // 3. Atualiza a URL de forma silenciosa para permitir compartilhamento
+        const url = new URL(window.location);
+        url.searchParams.set('id', id);
+        window.history.pushState({ id: id }, '', url);
+
+        // 4. Dispara o Modal Global (definido no navegacao.js)
+        if (typeof window.abrirModalNoticia === 'function') {
+            window.abrirModalNoticia(noticia);
         } else {
-            // 2. Se não estivermos na seção da notícia, carregamos a seção primeiro
-            // O sistema padrão de onSnapshot do Firebase cuidará de mostrar os dados
-            if (typeof window.carregarSecao === 'function') {
-                window.carregarSecao(noticia.origem || 'manchetes');
-            }
+            console.error("Erro: Função abrirModalNoticia não encontrada.");
         }
     }
 };
@@ -86,4 +88,4 @@ document.addEventListener('click', (e) => {
     }
 });
 
-console.log("🔍 Busca Global: Modo estável ativado.");
+console.log("🔍 Busca Global: Integrada ao Modal com sucesso.");

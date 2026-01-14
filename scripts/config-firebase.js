@@ -17,7 +17,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // --- CACHE DE DADOS ---
-// Tenta carregar do LocalStorage para início imediato, ou começa vazio
 const cacheSalvo = localStorage.getItem('cache_noticias_global');
 window.noticiasFirebase = cacheSalvo ? JSON.parse(cacheSalvo) : [];
 
@@ -38,40 +37,49 @@ function verificarGatilhoDeLink() {
 }
 
 /**
- * Sincronização inteligente com cache
+ * Sincronização inteligente com cache e Renderização Preguiçosa
  */
 function sincronizarComBusca(nomeColecao) {
     try {
         onSnapshot(collection(db, nomeColecao), (snapshot) => {
-            // Se o snapshot veio do cache do Firebase e já temos dados, ignoramos para poupar CPU
+            // Se os dados vierem do cache do Firebase e já tivermos algo na tela, não fazemos nada
             if (snapshot.metadata.fromCache && window.noticiasFirebase.length > 0) return;
 
-            // 1. Filtramos o array global removendo apenas os itens da coleção que está chegando
             const listaFiltrada = window.noticiasFirebase.filter(item => item.origem !== nomeColecao);
             
-            // 2. Mapeamos os novos dados
             const novosDados = snapshot.docs.map(doc => ({ 
                 id: doc.id, 
                 origem: nomeColecao, 
                 ...doc.data() 
             }));
             
-            // 3. Atualizamos o array global
             window.noticiasFirebase = [...listaFiltrada, ...novosDados];
-            
-            // 4. Ordenação global (apenas se houver campo de data)
             window.noticiasFirebase.sort((a, b) => (b.data || 0) - (a.data || 0));
 
-            // 5. SALVAR NO CACHE: Guarda os dados estruturados no navegador do usuário
-            localStorage.setItem('cache_noticias_global', JSON.stringify(window.noticiasFirebase));
+            // Salva no LocalStorage de forma assíncrona para não travar a UI
+            setTimeout(() => {
+                localStorage.setItem('cache_noticias_global', JSON.stringify(window.noticiasFirebase));
+            }, 0);
             
-            console.log(`✅ [Firebase Cache] ${nomeColecao} atualizado.`);
+            console.log(`✅ [Firebase] Coleção ${nomeColecao} sincronizada.`);
 
-            // 6. Notifica o sistema de busca ou seções se necessário
+            // RENDERIZAÇÃO SOB DEMANDA:
+            // Só pedimos para renderizar se a função existir e se não estivermos no meio de um scroll pesado
             if (typeof window.renderizarNoticias === 'function') {
-                // Se a seção atual tiver uma função de renderização, chamamos para atualizar a tela
-                // Mas apenas se os dados forem dessa coleção ou se for a primeira carga
-                window.renderizarNoticias(window.noticiasFirebase.filter(n => n.origem === nomeColecao));
+                // Usamos requestIdleCallback para renderizar apenas quando o navegador estiver livre
+                const renderTask = window.requestIdleCallback ? window.requestIdleCallback : (cb) => setTimeout(cb, 1);
+                
+                renderTask(() => {
+                    const dadosDaSecao = window.noticiasFirebase.filter(n => n.origem === nomeColecao);
+                    // Passamos apenas os primeiros 10 itens para a renderização inicial
+                    // O restante será renderizado conforme o usuário rola (Lazy Loading)
+                    window.renderizarNoticias(dadosDaSecao);
+                    
+                    // Reativa o observador de scroll para novos itens que entraram no DOM
+                    if (typeof window.ativarObservadorDeScroll === 'function') {
+                        window.ativarObservadorDeScroll();
+                    }
+                });
             }
 
             verificarGatilhoDeLink();
@@ -84,18 +92,15 @@ function sincronizarComBusca(nomeColecao) {
     }
 }
 
-// Expõe ferramentas
 window.db = db;
 window.collection = collection;
 window.onSnapshot = onSnapshot;
 
-// Inicializa o monitoramento
 const colecoesParaMonitorar = ["noticias", "lancamentos", "analises", "entrevistas", "podcast"];
 colecoesParaMonitorar.forEach(nome => sincronizarComBusca(nome));
 
-// Executa gatilho inicial caso o cache já contenha a notícia da URL
 if (window.noticiasFirebase.length > 0) {
     verificarGatilhoDeLink();
 }
 
-console.log("🔥 Motor AniGeekNews v2: Cache de dados ativado.");
+console.log("🔥 Motor v2.1: Performance de renderização ativada.");

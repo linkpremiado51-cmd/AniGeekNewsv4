@@ -98,19 +98,19 @@
     </footer>
 
     <div id="modal-noticia-global" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:99999; overflow-y:auto; backdrop-filter: blur(8px);">
-        <div id="modal-conteudo-interno" style="background: var(--bg, #fff); color: var(--text-main, #121212); max-width: 900px; margin: 20px auto; padding: 25px; border-radius: 12px; position: relative;">
-            <button onclick="window.fecharModalGlobal()" style="position: absolute; top: 15px; right: 15px; border: none; background: #eee; width: 35px; height: 35px; border-radius: 50%; font-size: 20px; cursor: pointer;">×</button>
+        <div id="modal-conteudo-interno" style="background: var(--bg, #fff); color: var(--text-main, #121212); max-width: 900px; margin: 20px auto; padding: 25px; border-radius: 12px; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+            <button onclick="window.fecharModalGlobal()" style="position: absolute; top: 15px; right: 15px; border: none; background: rgba(0,0,0,0.05); width: 35px; height: 35px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
             
             <div id="m-categoria" style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;"></div>
             <h2 id="m-titulo" style="font-size: clamp(22px, 5vw, 36px); font-weight: 850; margin: 0 0 15px 0; line-height: 1.2;"></h2>
             <p id="m-resumo" style="font-size: 16px; line-height: 1.6; opacity: 0.8; margin-bottom: 20px;"></p>
             
-            <div id="m-ficha" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
+            <div id="m-ficha" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; background: rgba(0,0,0,0.03); padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
             
             <iframe id="m-video" style="width: 100%; aspect-ratio: 16/9; border: none; border-radius: 8px;" allowfullscreen></iframe>
             
             <div style="margin-top: 25px; text-align: center;">
-                <a id="m-link" href="#" target="_blank" style="display: inline-block; padding: 12px 25px; background: var(--text-main); color: var(--bg); text-decoration: none; font-weight: 700; border-radius: 4px; text-transform: uppercase; font-size: 12px;">Ver Artigo Completo</a>
+                <a id="m-link" href="#" target="_blank" style="display: inline-block; padding: 12px 25px; background: var(--text-main); color: var(--bg); text-decoration: none; font-weight: 700; border-radius: 4px; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Ver Artigo Completo</a>
             </div>
         </div>
     </div>
@@ -119,6 +119,57 @@
     <script type="module" src="scripts/tema.js"></script>
     <script type="module" src="scripts/navegacao.js"></script>
     <script type="module" src="scripts/busca.js"></script>
+
+    <script>
+        // Função exigida pelo busca.js e config-firebase.js
+        window.abrirModalNoticia = (noticia) => {
+            const modal = document.getElementById('modal-noticia-global');
+            if (!modal) return;
+
+            // Injeta os dados no Modal
+            document.getElementById('m-categoria').innerText = noticia.categoria || "Geek";
+            document.getElementById('m-categoria').style.color = noticia.cor || "var(--primary)";
+            document.getElementById('m-titulo').innerText = noticia.titulo;
+            document.getElementById('m-resumo').innerText = noticia.resumo || "";
+            document.getElementById('m-video').src = noticia.videoPrincipal || "";
+            document.getElementById('m-link').href = noticia.linkArtigo || "#";
+
+            // Renderiza a ficha técnica se existir
+            const fichaContainer = document.getElementById('m-ficha');
+            if (noticia.ficha && noticia.ficha.length > 0) {
+                fichaContainer.style.display = 'grid';
+                fichaContainer.innerHTML = noticia.ficha.map(item => `
+                    <div style="border-left: 3px solid ${noticia.cor || '#eee'}; padding-left: 10px;">
+                        <div style="font-size: 9px; text-transform: uppercase; font-weight: 800; opacity: 0.5;">${item.label}</div>
+                        <div style="font-size: 13px; font-weight: 700;">${item.valor}</div>
+                    </div>
+                `).join('');
+            } else {
+                fichaContainer.style.display = 'none';
+            }
+
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.fecharModalGlobal = () => {
+            const modal = document.getElementById('modal-noticia-global');
+            modal.style.display = 'none';
+            document.getElementById('m-video').src = ""; // Para o vídeo
+            document.body.style.overflow = 'auto';
+            
+            // Limpa o parâmetro ID da URL ao fechar
+            const url = new URL(window.location);
+            url.searchParams.delete('id');
+            window.history.pushState({}, '', url);
+        };
+
+        // Fechar ao clicar fora
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal-noticia-global');
+            if (event.target == modal) window.fecharModalGlobal();
+        };
+    </script>
 
 </body>
 </html>

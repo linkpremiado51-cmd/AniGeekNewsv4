@@ -17,39 +17,51 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // --- UNIFICAÇÃO GLOBAL PARA A BUSCA ---
+// Lista única que centraliza todos os documentos do site
 window.noticiasFirebase = [];
 
 /**
- * Função inteligente que sincroniza qualquer coleção com a lisTa global de busca
- * @param {string} nomeColecao - Nome da pasta no Firebase (ex: 'lancamentos')
+ * Sincronização inteligente multisseção
+ * @param {string} nomeColecao - Nome da coleção no Firestore
  */
 function sincronizarComBusca(nomeColecao) {
-    onSnapshot(collection(db, nomeColecao), (snapshot) => {
-        // Remove os itens antigos desta coleção para evitar duplicados na busca
-        window.noticiasFirebase = window.noticiasFirebase.filter(item => item.origem !== nomeColecao);
-        
-        // Adiciona os itens novos marcando a origem
-        snapshot.docs.forEach(doc => {
-            window.noticiasFirebase.push({ 
+    try {
+        onSnapshot(collection(db, nomeColecao), (snapshot) => {
+            // 1. Limpa os dados antigos apenas desta coleção específica no array global
+            window.noticiasFirebase = window.noticiasFirebase.filter(item => item.origem !== nomeColecao);
+            
+            // 2. Mapeia e injeta os novos dados, marcando a origem para a busca
+            const novosDados = snapshot.docs.map(doc => ({ 
                 id: doc.id, 
                 origem: nomeColecao, 
                 ...doc.data() 
-            });
+            }));
+            
+            window.noticiasFirebase.push(...novosDados);
+            
+            // 3. Ordena globalmente por data (se o campo 'timestamp' ou 'data' existir)
+            window.noticiasFirebase.sort((a, b) => (b.data || 0) - (a.data || 0));
+            
+            console.log(`✅ [Firebase] Coleção sincronizada: ${nomeColecao} | Itens: ${snapshot.size}`);
+        }, (error) => {
+            console.error(`❌ Erro ao sincronizar ${nomeColecao}:`, error);
         });
-        
-        console.log(`✅ [Busca] Sincronizado: ${nomeColecao} (${snapshot.size} itens)`);
-    });
+    } catch (err) {
+        console.error(`⚠️ Falha ao inicializar coleção ${nomeColecao}:`, err);
+    }
 }
 
-// Exportando ferramentas para uso em outros scripts
+// Expõe ferramentas essenciais para os scripts de cada seção (.html)
 window.db = db;
 window.collection = collection;
 window.onSnapshot = onSnapshot;
 
-// --- INICIALIZAÇÃO DAS ESCUTAS ---
-// Agora a busca olha para as três coleções ao mesmo tempo
-sincronizarComBusca("noticias");
-sincronizarComBusca("lancamentos");
-sincronizarComBusca("analises");
+/**
+ * --- INICIALIZAÇÃO UNIVERSAL ---
+ * Adicione aqui qualquer nova coleção criada no Firebase para que a busca a encontre.
+ */
+const colecoesParaMonitorar = ["noticias", "lancamentos", "analises", "entrevistas", "podcast"];
 
-console.log("🔥 Motor AniGeekNews v2 Inicializado.");
+colecoesParaMonitorar.forEach(nome => sincronizarComBusca(nome));
+
+console.log("🔥 Motor AniGeekNews v2: Sincronização global ativada.");

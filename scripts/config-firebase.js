@@ -16,7 +16,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// --- UNIFICAÇÃO GLOBAL PARA A BUSCA E MODAL ---
+// --- UNIFICAÇÃO GLOBAL PARA A BUSCA E MOdAL ---
 window.noticiasFirebase = [];
 
 /**

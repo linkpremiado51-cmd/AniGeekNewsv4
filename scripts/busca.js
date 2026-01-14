@@ -4,7 +4,7 @@ const inputBusca = document.getElementById('input-busca-global');
 const surface = document.getElementById('search-results-surface');
 
 /**
- * Realça o termo pesquisado nos resultadoS
+ * Realça o termo pesquisado nos resultados
  */
 const destacarTexto = (texto, termo) => {
     if (!termo) return texto;
@@ -16,6 +16,8 @@ const destacarTexto = (texto, termo) => {
  * Renderiza os resultados de todas as coleções na superfície
  */
 function renderizarSuperficie(lista, termo) {
+    if (!surface) return;
+
     if (lista.length === 0) {
         surface.innerHTML = `
             <div style="padding:20px; text-align:center; color:#888;">
@@ -28,7 +30,7 @@ function renderizarSuperficie(lista, termo) {
             const tituloDestaque = destacarTexto(item.titulo, termo);
             
             return `
-            <div class="result-item-list" onclick="focarNoticia('${item.id}')" 
+            <div class="result-item-list" onclick="window.focarNoticia('${item.id}')" 
                  style="border-left: 4px solid ${item.cor || 'var(--primary)'}; display:flex; gap:12px; padding:10px; cursor:pointer; align-items:center; transition:0.2s; border-bottom: 1px solid var(--border);">
                 <div style="position:relative; flex-shrink:0;">
                     <img src="${thumb}" style="width:55px; height:55px; object-fit:cover; border-radius:4px;">
@@ -54,7 +56,7 @@ if (inputBusca) {
         const termo = e.target.value.toLowerCase().trim();
         
         if (termo.length < 2) { 
-            surface.style.display = 'none'; 
+            if (surface) surface.style.display = 'none'; 
             return; 
         }
 
@@ -75,28 +77,28 @@ if (inputBusca) {
  * Sincronizado com o sistema de limpeza de DOM do navegacao.js
  */
 window.focarNoticia = (id) => {
-    // 1. Esconde a superfície de busca e limpa o input
+    // 1. Esconde a superfície de busca e limpa o input IMEDIATAMENTE
     if (surface) surface.style.display = 'none';
     if (inputBusca) inputBusca.value = "";
     
-    // 2. Localiza o item no array global
-    const item = window.noticiasFirebase.find(n => n.id === id);
+    // 2. Localiza o objeto completo no array unificado do Firebase
+    const item = (window.noticiasFirebase || []).find(n => n.id === id);
     
     if (item) {
-        // 3. Atualiza a URL com o ID da notícia de forma silenciosa (sem recarregar)
-        // Isso permite que o usuário copie o link mesmo após clicar na busca
+        // 3. Atualiza a URL com o ID de forma silenciosa
         const url = new URL(window.location);
         url.searchParams.set('id', id);
-        window.history.pushState({}, '', url);
+        window.history.pushState({ id: id }, '', url);
 
-        // 4. Chama a função mestre do navegacao.js para limpar o DOM e renderizar
+        // 4. Dispara a limpeza do DOM e carregamento da seção/notícia
         if (typeof window.abrirNoticiaUnica === 'function') {
             window.abrirNoticiaUnica(item);
         } else {
-            // Se por algum erro crítico o script de navegação não estiver pronto,
-            // ele faz o reload para forçar a abertura pelo parâmetro da URL
-            window.location.reload();
+            // Caso o script de navegação não esteja pronto, força via URL
+            window.location.search = `?id=${id}`;
         }
+    } else {
+        console.warn("Item não encontrado na base de dados local.");
     }
 };
 

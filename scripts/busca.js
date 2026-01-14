@@ -4,7 +4,7 @@ const inputBusca = document.getElementById('input-busca-global');
 const surface = document.getElementById('search-results-surface');
 
 /**
- * Realça o termo pesquisado nos resUltados
+ * Realça o termo pesquisado nos resultados
  */
 const destacarTexto = (texto, termo) => {
     if (!termo) return texto;
@@ -72,23 +72,30 @@ if (inputBusca) {
 
 /**
  * Ação ao clicar no resultado:
- * Agora chama a função de limpeza de DOM e renderização única do navegacao.js
+ * Sincronizado com o sistema de limpeza de DOM do navegacao.js
  */
 window.focarNoticia = (id) => {
-    // 1. Fecha a lista de resultados e limpa o campo de busca
-    surface.style.display = 'none';
+    // 1. Esconde a superfície de busca e limpa o input
+    if (surface) surface.style.display = 'none';
     if (inputBusca) inputBusca.value = "";
     
-    // 2. Localiza o item no grande array global unificado
+    // 2. Localiza o item no array global
     const item = window.noticiasFirebase.find(n => n.id === id);
     
     if (item) {
-        // 3. ATUALIZAÇÃO: Chama a função central de navegação que limpa a tela e coloca o botão Voltar
+        // 3. Atualiza a URL com o ID da notícia de forma silenciosa (sem recarregar)
+        // Isso permite que o usuário copie o link mesmo após clicar na busca
+        const url = new URL(window.location);
+        url.searchParams.set('id', id);
+        window.history.pushState({}, '', url);
+
+        // 4. Chama a função mestre do navegacao.js para limpar o DOM e renderizar
         if (typeof window.abrirNoticiaUnica === 'function') {
             window.abrirNoticiaUnica(item);
         } else {
-            // Backup de segurança: se a função não existir, usa o parâmetro da URL
-            window.location.href = `?id=${item.id}`;
+            // Se por algum erro crítico o script de navegação não estiver pronto,
+            // ele faz o reload para forçar a abertura pelo parâmetro da URL
+            window.location.reload();
         }
     }
 };

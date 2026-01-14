@@ -1,3 +1,5 @@
+import { restaurarNoticiasSalvas } from '/anigeeknews/modulo-noticias.js';
+
 const dynamicContent = document.getElementById('dynamic-content');
 let originalContent = dynamicContent ? dynamicContent.innerHTML : "";
 
@@ -45,7 +47,7 @@ async function loadSection(section) {
 
     limparScriptsModulos();
 
-    /* === MANCHETES === */
+    /* === MANCHEtes === */
     if (section === 'manchetes') {
         dynamicContent.innerHTML = originalContent;
         localStorage.setItem('currentSection', 'manchetes');
@@ -60,13 +62,14 @@ async function loadSection(section) {
         return;
     }
 
-    /* === SUBMÓDULO: CONTEÚDO DE DESTAQUE === */
+    /* === SUBMÓDULO: CONTEÚDO DE DESTAQUE (dentro de Manchetes) === */
     if (section === 'destaque') {
         localStorage.setItem('currentSection', 'destaque');
 
         const html = await (await fetch('/anigeeknews/modulos/conteudo_de_destaque.html')).text();
         dynamicContent.innerHTML = html;
 
+        // FORÇA o JavaScript do submódulo a rodar
         const script = document.createElement('script');
         script.src = '/anigeeknews/modulos/conteudo_de_destaque.js';
         script.defer = true;
@@ -104,5 +107,5 @@ window.addEventListener('DOMContentLoaded', () => {
     activateButton(saved);
 
     if (saved !== 'manchetes') loadSection(saved);
-    else if (typeof restaurarNoticiasSalvas === "function") restaurarNoticiasSalvas();
+    else restaurarNoticiasSalvas();
 });

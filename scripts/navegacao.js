@@ -9,18 +9,20 @@ const displayPrincipal = document.getElementById('conteudo_de_destaque');
 function abrirNoticiaUnica(item) {
     if (!displayPrincipal) return;
 
-    // 1. Carrega o CSS da seção de origem (ex: lancamentos.css)
+    // 1. Carrega o CSS da seção de origem (ex: lancamentos.css) para manter o estilo do card
     gerenciarCSSDaSecao(item.origem || 'manchetes');
 
-    // 2. Prepara a estrutura de visualização com o botão de Voltar/Fechar
+    // 2. Prepara a estrutura. Como o DOM é limpo, usamos um botão de "VOLTAR"
     displayPrincipal.innerHTML = `
         <div class="foco-noticia-wrapper" style="animation: fadeIn 0.4s ease; max-width: var(--container-w); margin: 0 auto; padding: 20px;">
-            <div style="display: flex; justify-content: flex-start; padding-bottom: 20px; border-bottom: 1px solid var(--border); margin-bottom: 30px;">
-                <button onclick="window.voltarParaLista()" style="background: var(--text-main); color: var(--bg); border: none; padding: 10px 20px; font-size: 11px; font-weight: 800; letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s;">
-                    <i class="fa-solid fa-xmark"></i> FECHAR E VOLTAR
+            <div class="barra-ferramentas-foco" style="display: flex; justify-content: flex-start; padding-bottom: 20px; border-bottom: 1px dashed var(--border); margin-bottom: 30px;">
+                <button onclick="window.voltarParaLista()" class="btn-voltar-estilizado" style="background: none; border: 1px solid var(--text-main); color: var(--text-main); padding: 8px 18px; font-size: 10px; font-weight: 800; letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.3s; text-transform: uppercase;">
+                    <i class="fa-solid fa-chevron-left" style="font-size: 14px;"></i> 
+                    <span>Voltar para ${item.origem ? item.origem : 'Início'}</span>
                 </button>
             </div>
-            <div id="container-render-unico"></div>
+            <div id="container-render-unico">
+                </div>
         </div>
     `;
 
@@ -46,6 +48,9 @@ function verificarLinkCompartilhado() {
     const idNoticia = params.get('id');
 
     if (idNoticia) {
+        // Exibe um loader temporário enquanto o Firebase carrega
+        displayPrincipal.innerHTML = '<div style="text-align: center; padding: 99px; color: var(--text-muted);">Localizando notícia...</div>';
+
         // Aguarda o Firebase alimentar o array global antes de procurar
         const checkData = setInterval(() => {
             if (window.noticiasFirebase && window.noticiasFirebase.length > 0) {
@@ -53,28 +58,28 @@ function verificarLinkCompartilhado() {
                 if (item) {
                     abrirNoticiaUnica(item);
                 } else {
-                    // Se não achar o ID, volta para manchetes
+                    // Se não achar o ID após carregar os dados, volta para manchetes
                     carregarSecao('manchetes');
                 }
                 clearInterval(checkData);
             }
         }, 100);
         
-        // Timeout de segurança (5 segundos)
+        // Timeout de segurança (5 segundos) para não travar o site se o Firebase falhar
         setTimeout(() => clearInterval(checkData), 5000);
     }
 }
 
 /**
- * Função para limpar o ID da URL e voltar para a navegação normal
+ * Função para limpar o ID da URL e restaurar a visualização da seção
  */
 window.voltarParaLista = function() {
-    // Remove o parâmetro ID da URL sem recarregar
+    // 1. Remove o parâmetro ID da URL sem recarregar a página
     const url = new URL(window.location);
     url.searchParams.delete('id');
     window.history.pushState({}, '', url);
 
-    // Identifica qual seção estava ativa ou carrega manchetes
+    // 2. Identifica qual seção estava ativa antes ou carrega manchetes por padrão
     const tagAtiva = document.querySelector('.filter-tag.active');
     const secaoDestino = tagAtiva ? tagAtiva.dataset.section : 'manchetes';
     
@@ -112,7 +117,7 @@ async function carregarSecao(nome) {
         const html = await response.text();
         displayPrincipal.innerHTML = html;
 
-        // Ativa scripts do HTML carregado (suporte a módulos para Firebase)
+        // Ativa scripts do HTML carregado
         const scripts = displayPrincipal.querySelectorAll("script");
         scripts.forEach(oldScript => {
             const newScript = document.createElement("script");
@@ -145,20 +150,18 @@ window.toggleMobileMenu = function() {
 };
 
 /**
- * INICIALIZAÇÃO INTELIGENTE
+ * INICIALIZAÇÃO INTELIGENTE: Decide se abre uma notícia ou o feed
  */
 window.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     
     if (params.has('id')) {
-        // Se entrar por link direto, usa o vigia
         verificarLinkCompartilhado();
     } else {
-        // Se entrar normal, carrega manchetes
         carregarSecao('manchetes');
     }
 });
 
-// Exportação global de funções essenciais
+// Exportação global
 window.carregarSecao = carregarSecao;
 window.abrirNoticiaUnica = abrirNoticiaUnica;

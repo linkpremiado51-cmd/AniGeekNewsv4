@@ -1,10 +1,8 @@
 /* scripts/config-firebase.js */
 
-// Importações do SDK do Firebase via CDN
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Configuração do seu projeto AniGeekNews
 const firebaseConfig = {
     apiKey: "AIzaSyBC_ad4X9OwCHKvcG_pNQkKEl76Zw2tu6o",
     authDomain: "anigeeknews.firebaseapp.com",
@@ -15,30 +13,43 @@ const firebaseConfig = {
     measurementId: "G-G5T8CCRGZT"
 };
 
-// Inicializa o Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// --- NOVIDADE: Sincronização para a Busca ---
-window.noticiasFirebase = []; // Criamos a lista global vazia
+// --- UNIFICAÇÃO GLOBAL PARA A BUSCA ---
+window.noticiasFirebase = [];
 
-// Função que fica ouvindo o banco de dados em tempo real
-function carregarNoticiasRealTime() {
-    onSnapshot(collection(db, "noticias"), (snapshot) => {
-        window.noticiasFirebase = snapshot.docs.map(doc => ({ 
-            id: doc.id, 
-            ...doc.data() 
-        }));
-        console.log("✅ Busca sincronizada com Firebase.");
+/**
+ * Função inteligente que sincroniza qualquer coleção com a lista global de busca
+ * @param {string} nomeColecao - Nome da pasta no Firebase (ex: 'lancamentos')
+ */
+function sincronizarComBusca(nomeColecao) {
+    onSnapshot(collection(db, nomeColecao), (snapshot) => {
+        // Remove os itens antigos desta coleção para evitar duplicados na busca
+        window.noticiasFirebase = window.noticiasFirebase.filter(item => item.origem !== nomeColecao);
+        
+        // Adiciona os itens novos marcando a origem
+        snapshot.docs.forEach(doc => {
+            window.noticiasFirebase.push({ 
+                id: doc.id, 
+                origem: nomeColecao, 
+                ...doc.data() 
+            });
+        });
+        
+        console.log(`✅ [Busca] Sincronizado: ${nomeColecao} (${snapshot.size} itens)`);
     });
 }
 
-// Exporta para o escopo global (window) para que outros scripts modularizados acessem
+// Exportando ferramentas para uso em outros scripts
 window.db = db;
 window.collection = collection;
 window.onSnapshot = onSnapshot;
 
-// Inicia a escuta das notícias imediatamente
-carregarNoticiasRealTime();
+// --- INICIALIZAÇÃO DAS ESCUTAS ---
+// Agora a busca olha para as três coleções ao mesmo tempo
+sincronizarComBusca("noticias");
+sincronizarComBusca("lancamentos");
+sincronizarComBusca("analises");
 
-console.log("🔥 Firebase inicializado com sucesso.");
+console.log("🔥 Motor AniGeekNews v2 Inicializado.");

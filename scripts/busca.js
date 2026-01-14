@@ -4,7 +4,7 @@ const inputBusca = document.getElementById('input-busca-global');
 const surface = document.getElementById('search-results-surface');
 
 /**
- * Renderiza os resultados na superfície flutuantE
+ * Renderiza os resultados na superfície flutUantE
  */
 function renderizarSuperficie(lista) {
     if (lista.length === 0) {

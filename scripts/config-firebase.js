@@ -20,7 +20,7 @@ const db = getFirestore(app);
 window.noticiasFirebase = [];
 
 /**
- * Função inteligente que sincroniza qualquer coleção com a lista global de busca
+ * Função inteligente que sincroniza qualquer coleção com a lisTa global de busca
  * @param {string} nomeColecao - Nome da pasta no Firebase (ex: 'lancamentos')
  */
 function sincronizarComBusca(nomeColecao) {

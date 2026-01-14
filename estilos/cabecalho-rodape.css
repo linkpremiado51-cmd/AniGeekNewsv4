@@ -1,141 +1,278 @@
-/* --- CABEÇALHO (HEADER) E NAVEGAÇÃO --- */
-.sticky-header-group {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    background-color: var(--bg);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-}
+<div class="destaque-wrapper">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
+  <style>
+    /* Ajustes de Design Profissional baseados no estilo Manchetes */
+    :root {
+      --font-main: 'Inter', sans-serif;
+      --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-header { 
-    background: var(--bg); 
-    border-bottom: 1px solid var(--border); 
-}
+    .destaque-wrapper { font-family: var(--font-main); color: var(--text-main); }
 
-.nav-container {
-    max-width: var(--container-w);
-    margin: 0 auto;
-    height: var(--header-h);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-}
+    /* Barra Superior de Notificação Estilizada */
+    #notificacao-novo-artigo {
+      background: #f8f9fa;
+      border-bottom: 1px solid #eee;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
 
-.logo {
-    font-family: var(--font-logo);
-    font-size: 25px;
-    font-weight: 700;
-    color: var(--text-main);
-    letter-spacing: -1px;
-}
+    /* Card de Artigo Profissional */
+    .destaque-secao {
+      background: #fff;
+      border: 1px solid #eaeaea;
+      margin-bottom: 40px;
+      border-radius: 4px; /* Estilo mais limpo e reto como jornais modernos */
+      overflow: hidden;
+      transition: var(--transition-smooth);
+    }
 
-.logo span { 
-    font-style: italic; 
-    font-weight: 400; 
-}
+    .destaque-secao:hover {
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
 
-.nav-menu { 
-    display: flex; 
-    gap: 30px; 
-    list-style: none; 
-    align-items: center; 
-}
+    .destaque-padding { padding: 25px; }
 
-.nav-item > a {
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    padding: 24px 0;
-    display: block;
-    border-bottom: 2px solid transparent;
-}
+    .destaque-categoria {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--tema-cor);
+      margin-bottom: 12px;
+    }
 
-.nav-item:hover > a { 
-    border-bottom-color: var(--primary); 
-}
+    .destaque-titulo {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 15px;
+      letter-spacing: -0.5px;
+    }
 
-.header-actions { 
-    display: flex; 
-    align-items: center; 
-    gap: 20px; 
-}
+    .destaque-resumo {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #555;
+      margin-bottom: 20px;
+    }
 
-/* --- BOTÕES DE MENU E SEÇÕES --- */
-.sections-btn {
-    background: none; 
-    border: none; 
-    cursor: pointer;
-    display: flex; 
-    flex-direction: column; 
-    gap: 4px; 
-    padding: 5px;
-}
+    /* Botão Ver Artigo (Estilo Manchete) */
+    .btn-ver-artigo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--tema-cor);
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      transition: var(--transition-smooth);
+    }
 
-.sections-btn .bar { 
-    display: block; 
-    width: 20px; 
-    height: 2px; 
-    background-color: var(--text-main); 
-}
+    .btn-ver-artigo:hover { opacity: 0.9; filter: brightness(1.1); }
 
-.menu-toggle { 
-    background: none; 
-    border: none; 
-    font-size: 20px; 
-    color: var(--text-main); 
-    cursor: pointer; 
-    display: none; 
-}
+    /* Grid de Informações (Ficha Técnica) */
+    .destaque-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 15px;
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid #f0f0f0;
+    }
 
-/* --- MENU MOBILE --- */
-.mobile-menu {
-    position: fixed; 
-    top: var(--header-h); 
-    right: -100%; 
-    width: 100%; 
-    height: calc(100vh - var(--header-h));
-    background: var(--bg); 
-    z-index: 2000; 
-    padding: 20px; 
-    transition: 0.3s; 
-    overflow-y: auto;
-}
+    .info-item { display: flex; flex-direction: column; gap: 4px; }
+    .info-label { font-size: 10px; text-transform: uppercase; font-weight: 700; opacity: 0.5; }
+    .info-valor { font-size: 13px; font-weight: 600; }
 
-.mobile-menu.active { 
-    right: 0; 
-}
+    /* Media e Video */
+    .destaque-media { position: relative; padding-top: 56.25%; background: #000; }
+    .destaque-media iframe {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
+    }
 
-.close-menu { 
-    position: absolute; 
-    top: 15px; 
-    right: 15px; 
-    background: none; 
-    border: none; 
-    font-size: 24px; 
-    color: var(--text-main); 
-}
+    /* Carrossel de Relacionados Estilizado */
+    .carrossel-temas { background: #fafafa; padding: 20px; border-top: 1px solid #eee; }
+    .carrossel-header { margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; }
+    .temas-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
 
-.mobile-menu-item { 
-    padding: 15px 0; 
-    border-bottom: 1px solid var(--border); 
-    font-weight: 600; 
-    text-transform: uppercase; 
-    font-size: 13px; 
-}
+    .temas-scroll-wrapper { overflow-x: auto; scrollbar-width: none; }
+    .temas-container { display: flex; gap: 15px; padding-bottom: 10px; }
 
-/* --- RODAPÉ (FOOTER) --- */
-footer { 
-    border-top: 1px solid var(--border); 
-    padding: 40px 0; 
-    margin-top: 60px; 
-    text-align: center; 
-    color: var(--text-muted); 
-    font-size: 12px; 
-}
+    .tema-card {
+      min-width: 160px; cursor: pointer; transition: var(--transition-smooth);
+    }
 
-/* --- MEDIA QUERIES (RESPONSIVIDADE DO HEADER) --- */
-@media (max-width: 900px) {
-    .nav-menu { display: none; }
-    .menu-toggle { display: block; }
-}
+    .tema-thumb {
+      width: 100%; height: 90px; object-fit: cover; border-radius: 4px; margin-bottom: 8px;
+      border: 2px solid transparent;
+    }
+
+    .tema-card:hover .tema-thumb { border-color: var(--tema-cor); }
+    .tema-titulo { font-size: 12px; font-weight: 700; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+    /* Notificações de Interação */
+    #notificacao-video {
+      position: fixed; bottom: 20px; right: 20px; z-index: 3000;
+      background: #fff; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 15px;
+      transform: translateX(120%); transition: 0.5s;
+    }
+    #notificacao-video.visivel { transform: translateX(0); }
+    .btn-confirmar-video { background: var(--notif-cor); color: #fff; border: none; padding: 8px 15px; border-radius: 4px; font-weight: 700; cursor: pointer; }
+
+    #toast-copiado {
+      position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+      background: #333; color: #fff; padding: 10px 20px; border-radius: 30px;
+      font-size: 12px; font-weight: 600; opacity: 0; transition: 0.3s; z-index: 4000;
+    }
+    #toast-copiado.mostrar { opacity: 1; top: 100px; }
+  </style>
+
+  <div id="notificacao-novo-artigo">
+    <i class="fa-solid fa-bullhorn" style="color: #666;"></i>
+    <div>
+      <div style="font-size: 10px; font-weight: 800; opacity: 0.5; text-transform: uppercase;">Em Destaque</div>
+      <div id="novo-artigo-titulo" style="font-size: 13px; font-weight: 700;">Carregando feed...</div>
+    </div>
+  </div>
+
+  <div id="container-principal">
+     <div style="text-align: center; padding: 100px 0; opacity: 0.5;"><i class="fa-solid fa-circle-notch fa-spin"></i> Sincronizando dados...</div>
+  </div>
+
+  <div id="notificacao-video">
+    <div style="flex: 1;">
+      <div style="font-size: 9px; font-weight: 800; opacity: 0.5; text-transform: uppercase;">Trocar vídeo agora?</div>
+      <div id="notif-titulo" style="font-size: 12px; font-weight: 700;">Título do Vídeo</div>
+    </div>
+    <button class="btn-confirmar-video" id="btn-confirmar">SIM</button>
+    <i class="fa-solid fa-xmark" style="cursor:pointer; padding: 5px; opacity: 0.5;" onclick="window.fecharNotif()"></i>
+  </div>
+
+  <div id="toast-copiado">LINK COPIADO COM SUCESSO</div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBC_ad4X9OwCHKvcG_pNQkKEl76Zw2tu6o",
+      authDomain: "anigeeknews.firebaseapp.com",
+      projectId: "anigeeknews",
+      storageBucket: "anigeeknews.firebasestorage.app",
+      messagingSenderId: "769322939926",
+      appId: "1:769322939926:web:6eb91a96a3f74670882737"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let playerAlvo = '';
+    let urlAlvo = '';
+
+    window.copiarLink = async (url) => {
+      try {
+        await navigator.clipboard.writeText(url);
+        const toast = document.getElementById('toast-copiado');
+        toast.classList.add('mostrar');
+        setTimeout(() => toast.classList.remove('mostrar'), 2500);
+      } catch (err) { console.error(err); }
+    };
+
+    window.pedirTroca = (idPlayer, idVideo, titulo, cor) => {
+      playerAlvo = idPlayer;
+      urlAlvo = `https://www.youtube.com/embed/${idVideo}?autoplay=1`;
+      const notif = document.getElementById('notificacao-video');
+      document.getElementById('notif-titulo').innerText = titulo;
+      notif.style.setProperty('--notif-cor', cor);
+      notif.classList.add('visivel');
+    };
+
+    window.fecharNotif = () => document.getElementById('notificacao-video').classList.remove('visivel');
+
+    document.getElementById('btn-confirmar').onclick = () => {
+      const player = document.getElementById(playerAlvo);
+      if (player) player.src = urlAlvo;
+      window.fecharNotif();
+    };
+
+    function renderizarNoticias(listaCompleta) {
+      const container = document.getElementById('container-principal');
+      const baseUrl = window.location.origin + window.location.pathname;
+
+      container.innerHTML = listaCompleta.map(news => {
+        const shareUrl = `${baseUrl}?id=${encodeURIComponent(news.id)}`;
+        return `
+        <article class="destaque-secao" style="--tema-cor: ${news.cor}">
+          <div class="destaque-padding">
+            <div class="destaque-categoria">${news.categoria}</div>
+            <div class="destaque-header" style="display:flex; justify-content:space-between; align-items: flex-start; gap: 15px;">
+              <h2 class="destaque-titulo">${news.titulo}</h2>
+              <button onclick="window.copiarLink('${shareUrl}')" style="background:none; border:none; cursor:pointer; font-size: 18px; opacity:0.3;"><i class="fa-solid fa-link"></i></button>
+            </div>
+            <p class="destaque-resumo">${news.resumo}</p>
+            <a href="${news.linkArtigo}" target="_blank" class="btn-ver-artigo"><i class="fa-solid fa-arrow-right"></i> Ler Artigo Completo</a>
+            
+            <div class="destaque-info-grid">
+              ${news.ficha ? news.ficha.map(item => `
+                <div class="info-item">
+                  <span class="info-label">${item.label}</span>
+                  <span class="info-valor">${item.valor}</span>
+                </div>`).join('') : ''}
+            </div>
+          </div>
+
+          <div class="destaque-media">
+            <iframe id="player-${news.id}" src="${news.videoPrincipal}" allowfullscreen></iframe>
+          </div>
+
+          <div class="carrossel-temas">
+            <div class="carrossel-header">
+                <span class="temas-label">Conteúdo Relacionado</span>
+                <i class="fa-solid fa-chevron-right" style="font-size:10px; opacity:0.3;"></i>
+            </div>
+            <div class="temas-scroll-wrapper">
+                <div class="temas-container">
+                    ${news.relacionados ? news.relacionados.map(rel => `
+                      <div class="tema-card" onclick="window.pedirTroca('player-${news.id}', '${rel.idVid}', '${rel.titulo.replace(/'/g, "\\'")}', '${news.cor}')">
+                        <img src="${rel.thumb}" class="tema-thumb">
+                        <div class="tema-titulo">${rel.titulo}</div>
+                      </div>`).join('') : ''}
+                </div>
+            </div>
+          </div>
+        </article>`;
+      }).join('');
+    }
+
+    function carregarTudoRealTime() {
+      // APENAS MUDE O NOME ABAIXO PARA CADA ARQUIVO (noticias, lancamentos, podcast, etc)
+      const q = collection(db, "lancamentos");
+      
+      onSnapshot(q, (snapshot) => {
+        const dados = [];
+        snapshot.forEach((doc) => dados.push({ id: doc.id, ...doc.data() }));
+        
+        if (dados.length === 0) {
+            document.getElementById('container-principal').innerHTML = "<div style='text-align:center; padding:100px; opacity:0.5;'>Nenhuma publicação disponível.</div>";
+        } else {
+            renderizarNoticias(dados);
+            document.getElementById('novo-artigo-titulo').innerText = dados[0].titulo;
+        }
+      });
+    }
+
+    carregarTudoRealTime();
+  </script>
+</div>

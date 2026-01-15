@@ -13,175 +13,82 @@
             --nyt-black: #121212;
             --nyt-paper: #fff;
             --nyt-off-white: #fdfdfd;
-            --accent-news: #c1121f;
             --border: #ddd;
             --text-main: #202020;
             --text-muted: #666;
-            --font-serif: 'Noto Serif', serif;
-            --font-sans: 'Inter', sans-serif;
-        }
-
-        body.dark-mode {
-            --nyt-off-white: #111;
-            --nyt-paper: #111;
-            --text-main: #e0e0e0;
-            --border: #333;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: var(--font-sans);
+            font-family: 'Inter', sans-serif;
             background: var(--nyt-off-white);
-            color: var(--text-main);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
         }
 
         .auth-container {
-            background: var(--nyt-paper);
+            background: white;
             padding: 40px;
             width: 100%;
             max-width: 420px;
             border: 1px solid var(--border);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
 
         .brand-header {
             text-align: center;
             margin-bottom: 30px;
-            border-bottom: 3px solid var(--nyt-black);
-            padding-bottom: 15px;
         }
-
-        .brand-header h1 {
-            font-family: var(--font-serif);
-            font-size: 28px;
-            letter-spacing: -1px;
-            color: var(--text-main);
-        }
-
-        .brand-header span { font-style: italic; font-weight: 400; }
 
         .form-title {
-            text-transform: uppercase;
             font-weight: 800;
-            font-size: 14px;
-            letter-spacing: 1px;
-            margin-bottom: 25px;
-            display: block;
+            margin-bottom: 20px;
             text-align: center;
         }
 
         .input-group {
-            margin-bottom: 20px;
-            position: relative;
+            margin-bottom: 15px;
         }
 
         .input-group label {
-            display: block;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-            color: var(--text-muted);
         }
 
         .input-group input {
             width: 100%;
             padding: 12px;
             border: 1px solid var(--border);
-            background: transparent;
-            color: var(--text-main);
-            font-size: 14px;
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 12px;
-            bottom: 12px;
-            cursor: pointer;
-            color: var(--text-muted);
         }
 
         .btn-primary {
             width: 100%;
             padding: 14px;
-            background: var(--nyt-black);
+            background: black;
             color: white;
             border: none;
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
             cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 25px 0;
-            font-size: 12px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-        }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .divider::before { margin-right: 10px; }
-        .divider::after { margin-left: 10px; }
-
-        .social-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-
-        .social-btn {
-            padding: 10px;
-            border: 1px solid var(--border);
-            background: white;
-            cursor: not-allowed;
-            opacity: 0.5;
         }
 
         .links-footer {
-            margin-top: 25px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
+            margin-top: 15px;
+            text-align: center;
         }
 
         .links-footer a {
-            color: var(--text-main);
-            text-decoration: none;
-            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
         }
 
         .hidden { display: none; }
 
         #mensagem {
             margin-top: 15px;
-            font-size: 13px;
+            text-align: center;
             font-weight: 600;
-            text-align: center;
-        }
-
-        .footer-info {
-            margin-top: 30px;
-            text-align: center;
-            font-size: 10px;
-            color: var(--text-muted);
-            text-transform: uppercase;
         }
     </style>
 </head>
@@ -191,14 +98,12 @@
 <div class="auth-container">
 
     <header class="brand-header">
-        <a href="../index.html" style="text-decoration:none;">
-            <h1>AniGeek<span>News</span></h1>
-        </a>
+        <h1>AniGeekNews</h1>
     </header>
 
     <!-- LOGIN -->
     <div id="login-section">
-        <span class="form-title">Acesse sua conta</span>
+        <div class="form-title">Acesse sua conta</div>
 
         <div class="input-group">
             <label>E-mail</label>
@@ -208,19 +113,18 @@
         <div class="input-group">
             <label>Senha</label>
             <input type="password" id="login-senha">
-            <i class="fa-regular fa-eye toggle-password"></i>
         </div>
 
-        <button class="btn-primary" id="login-btn">Entrar na conta</button>
+        <button class="btn-primary" id="login-btn">Entrar</button>
 
         <div class="links-footer">
-            <a href="#" onclick="showTab('signup')">Criar conta</a>
+            <a onclick="showTab('signup')">Criar conta</a>
         </div>
     </div>
 
     <!-- CADASTRO -->
     <div id="signup-section" class="hidden">
-        <span class="form-title">Faça parte da comunidade</span>
+        <div class="form-title">Criar conta</div>
 
         <div class="input-group">
             <label>Nome</label>
@@ -235,24 +139,22 @@
         <div class="input-group">
             <label>Senha</label>
             <input type="password" id="signup-senha">
-            <i class="fa-regular fa-eye toggle-password"></i>
         </div>
 
-        <button class="btn-primary" id="signup-btn">Finalizar cadastro</button>
+        <button class="btn-primary" id="signup-btn">Cadastrar</button>
 
         <div class="links-footer">
-            <a href="#" onclick="showTab('login')">Já tenho cadastro</a>
+            <a onclick="showTab('login')">Já tenho conta</a>
         </div>
     </div>
 
     <p id="mensagem"></p>
-
-    <div class="footer-info">
-        © 2025 AniGeek Media — Jornalismo Independente
-    </div>
-
 </div>
 
+<!-- FIREBASE CONFIG -->
+<script type="module" src="../scripts/config-firebase.js"></script>
+
+<!-- AUTH -->
 <script type="module">
 import {
     getAuth,
@@ -262,57 +164,34 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const auth = window.auth || getAuth();
-
-// ELEMENTOS
 const msg = document.getElementById('mensagem');
 
-// LOGIN
 const loginEmail = document.getElementById('login-email');
 const loginSenha = document.getElementById('login-senha');
-const loginBtn = document.getElementById('login-btn');
-
-// CADASTRO
-const signupNome = document.getElementById('signup-nome');
 const signupEmail = document.getElementById('signup-email');
 const signupSenha = document.getElementById('signup-senha');
-const signupBtn = document.getElementById('signup-btn');
+const signupNome  = document.getElementById('signup-nome');
 
-// TROCA DE TELA
 window.showTab = function(tab) {
-    document
-        .getElementById('login-section')
-        .classList.toggle('hidden', tab !== 'login');
-
-    document
-        .getElementById('signup-section')
-        .classList.toggle('hidden', tab !== 'signup');
-
+    document.getElementById('login-section').classList.toggle('hidden', tab !== 'login');
+    document.getElementById('signup-section').classList.toggle('hidden', tab !== 'signup');
     msg.textContent = '';
 };
 
-// LOGIN
-loginBtn.addEventListener('click', async () => {
-    msg.textContent = '';
-
+document.getElementById('login-btn').addEventListener('click', async () => {
     try {
         await signInWithEmailAndPassword(
             auth,
             loginEmail.value,
             loginSenha.value
         );
-
         window.location.href = "../index.html";
-
     } catch (e) {
-        console.error(e);
-        msg.textContent = "❌ E-mail ou senha inválidos.";
+        msg.textContent = "Erro ao entrar.";
     }
 });
 
-// CADASTRO
-signupBtn.addEventListener('click', async () => {
-    msg.textContent = '';
-
+document.getElementById('signup-btn').addEventListener('click', async () => {
     try {
         const cred = await createUserWithEmailAndPassword(
             auth,
@@ -325,10 +204,8 @@ signupBtn.addEventListener('click', async () => {
         });
 
         window.location.href = "../index.html";
-
     } catch (e) {
-        console.error(e);
-        msg.textContent = "❌ Erro ao criar conta.";
+        msg.textContent = "Erro ao criar conta.";
     }
 });
 </script>

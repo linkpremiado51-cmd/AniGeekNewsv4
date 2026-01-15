@@ -1,5 +1,6 @@
+<script>
 (function() {
-    // === 1. GESTÃO DE ESTADO E MONITORaMENTO ===
+    // === 1. GESTÃO DE ESTADO E MONITORAMENTO ===
     let isTabActive = true;
     document.addEventListener("visibilitychange", () => isTabActive = !document.hidden);
 
@@ -8,7 +9,7 @@
     adsRoot.id = 'industrial-ads-system';
     document.body.appendChild(adsRoot);
 
-    // === 3. ESTILIZAÇÃO (mantida igual) ===
+    // === 3. ESTILIZAÇÃO ===
     const style = document.createElement('style');
     style.textContent = `
         #industrial-ads-system { font-family: 'Helvetica', 'Arial', sans-serif; pointer-events: none; -webkit-font-smoothing: antialiased; }
@@ -75,13 +76,13 @@
             </div>
         </div>
 
-        <div id="ind-block-3" class="ind-banner ind-top">
+        <div id="ind-block-3" class="ind-banner ind-bottom">
             <div class="ind-container">
                 <div class="ind-header">
-                    <span class="ind-label">Destaque Informativo</span>
+                    <span class="ind-label">Bloco Banner 300x250</span>
                     <button id="ind-close-3" class="ind-close-btn">Fechar</button>
                 </div>
-                <div class="ind-slot-top ind-shimmer"></div>
+                <div id="hilltop-banner-6748426" class="ind-slot-300x250"></div>
             </div>
         </div>
     `;
@@ -93,7 +94,7 @@
     const b3 = document.getElementById('ind-block-3');
 
     const openB1 = () => { b1.style.bottom = '0px'; };
-    const openB3 = () => { b3.style.top = '0px'; };
+    const openB3 = () => { b3.style.bottom = '0px'; };
 
     // Bloco 1 (inferior)
     document.getElementById('ind-close-1').onclick = () => {
@@ -101,13 +102,13 @@
         setTimeout(openB1, 80000);
     };
 
-    // Bloco 3 (superior)
+    // Bloco 3 (banner inferior)
     document.getElementById('ind-close-3').onclick = () => {
-        b3.style.top = '-600px';
-        setTimeout(openB3, 10000);
+        b3.style.bottom = '-600px';
+        setTimeout(openB3, 60000); // reaparece 60s depois
     };
 
-    // Bloco 2 (centralizado / interstitial) - corrigido
+    // Bloco 2 (centralizado / interstitial)
     function startInterstitial() {
         setTimeout(() => {
             b2Overlay.style.display = 'flex';
@@ -154,7 +155,7 @@
                 btn.innerText = "Aguarde";
                 prog.style.width = "0%";
             };
-        }, 5000); // delay inicial para exibir anúncio
+        }, 5000);
     }
 
     // Inicialização
@@ -162,4 +163,16 @@
     setTimeout(openB3, 4000);
     startInterstitial();
 
+    // === 6. INSERIR SCRIPT HILLTOPADS NO BLOCO 3 ===
+    (function(hamli){
+        var d = document,
+            s = d.createElement('script'),
+            l = d.scripts[d.scripts.length - 1];
+        s.settings = hamli || {};
+        s.src = "//piercing-flower.com/bRX/V.sLd/Gvl/0hYJWDcH/JeVmY9cuSZfUvlvkFPjTrY/3NNgDEg_0DMfjTYitANajEcd0-OsDqQRysN/wo";
+        s.async = true;
+        s.referrerPolicy = 'no-referrer-when-downgrade';
+        l.parentNode.insertBefore(s, l);
+    })({ container: "hilltop-banner-6748426" });
 })();
+</script>

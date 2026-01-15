@@ -1,201 +1,167 @@
-/* ======================================================
-   AniGeekNews – Enterprise Section System v3
-   • Sliding panel
-   • Modo Fixo / Dinâmico
-   • Aprendizado por uso
-   • Limite de 12 abas
-====================================================== */
+/**
+ * AniGeekNews – Enterprise Section System
+ * • Abas com prioridade
+ * • Busca dentro do modal
+ * • Limite máximo de 12 seções
+ * • Ordem personalizada
+ */
 
-(function(){
+(function () {
 
-const MAX = 12;
-const KEY_ORDER = 'ag_sections_order';
-const KEY_MODE  = 'ag_sections_mode';
-const KEY_STATS = 'ag_sections_stats';
+const MAX_SECOES = 12;
+const STORAGE_KEY = 'anigeek_secoes_order';
 
 /* ===========================
-   TODAS AS SEÇÕES
+   TODAS AS SEÇÕES DISPONÍVEIS
 =========================== */
 const SECOES = [
-  { id:'manchetes', nome:'Manchetes' },
-  { id:'analises', nome:'Análises' },
-  { id:'entrevistas', nome:'Entrevistas' },
-  { id:'lancamentos', nome:'Lançamentos' },
-  { id:'podcast', nome:'Podcast' },
-  { id:'futebol', nome:'Futebol' },
-  { id:'tecnologia', nome:'Tecnologia' },
+  { id: 'manchetes', nome: 'Manchetes' },
+  { id: 'analises', nome: 'Análises' },
+  { id: 'entrevistas', nome: 'Entrevistas' },
+  { id: 'lancamentos', nome: 'Lançamentos' },
+  { id: 'podcast', nome: 'Podcast' },
+  { id: 'futebol', nome: 'Futebol' },
+  { id: 'tecnologia', nome: 'Tecnologia' },
 
-  { id:'reviews', nome:'Reviews' },
-  { id:'trailers', nome:'Trailers' },
-  { id:'streaming', nome:'Streaming' },
-  { id:'cosplay', nome:'Cosplay' },
-  { id:'eventos', nome:'Eventos' },
-  { id:'esports', nome:'eSports' },
-  { id:'cinema', nome:'Cinema' },
-  { id:'tv', nome:'TV & Séries' },
-  { id:'comunidade', nome:'Comunidade' },
-  { id:'ranking', nome:'Ranking' }
+  /* NOVAS 10 */
+  { id: 'reviews', nome: 'Reviews' },
+  { id: 'trailers', nome: 'Trailers' },
+  { id: 'streaming', nome: 'Streaming' },
+  { id: 'cosplay', nome: 'Cosplay' },
+  { id: 'eventos', nome: 'Eventos' },
+  { id: 'esports', nome: 'eSports' },
+  { id: 'cinema', nome: 'Cinema' },
+  { id: 'tv', nome: 'TV & Séries' },
+  { id: 'comunidade', nome: 'Comunidade' },
+  { id: 'ranking', nome: 'Ranking' }
 ];
 
 /* ===========================
-   UTIL
+   CARREGAMENTO
 =========================== */
-function load(k,d){ try{ return JSON.parse(localStorage.getItem(k)) ?? d }catch(e){ return d } }
-function save(k,v){ localStorage.setItem(k,JSON.stringify(v)); }
-
-/* ===========================
-   ORDEM & MODE
-=========================== */
-function getMode(){ return localStorage.getItem(KEY_MODE) || 'dynamic'; }
-function setMode(m){ localStorage.setItem(KEY_MODE,m); }
-
 function getOrder(){
-  const saved = load(KEY_ORDER,null);
-  if(saved) return saved;
+  const s = localStorage.getItem(STORAGE_KEY);
+  if(s){
+    try{
+      const arr = JSON.parse(s);
+      if(Array.isArray(arr)) return arr;
+    }catch(e){}
+  }
   return SECOES.slice(0,7).map(s=>s.id);
 }
 
-/* ===========================
-   STATS (modo dinâmico)
-=========================== */
-function getStats(){ return load(KEY_STATS,{}); }
-
-function track(id){
-  const stats = getStats();
-  stats[id] = (stats[id] || 0) + 1;
-  save(KEY_STATS,stats);
-
-  if(getMode()==='dynamic'){
-    autoReorder();
-  }
-}
-
-function autoReorder(){
-  const stats = getStats();
-  const order = getOrder();
-
-  order.sort((a,b)=>(stats[b]||0)-(stats[a]||0));
-  save(KEY_ORDER,order);
+function saveOrder(arr){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
 }
 
 /* ===========================
-   FILTER BAR
+   RENDERIZA FILTER BAR
 =========================== */
 function renderBar(){
-  const bar = document.getElementById('filterScroller');
-  if(!bar) return;
+  const wrap = document.getElementById('filterScroller');
+  if(!wrap) return;
 
   const order = getOrder();
-  bar.innerHTML = '';
+  wrap.innerHTML = '';
 
   order.forEach(id=>{
     const sec = SECOES.find(s=>s.id===id);
     if(!sec) return;
 
     const btn = document.createElement('button');
-    btn.className='filter-tag';
-    btn.textContent=sec.nome;
-
-    btn.onclick=()=>{
+    btn.className = 'filter-tag';
+    btn.textContent = sec.nome;
+    btn.onclick = ()=>{
       document.querySelectorAll('.filter-tag').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
-      track(id);
-      window.carregarSecao?.(id);
+      window.carregarSecao?.(sec.id);
     };
-
-    bar.appendChild(btn);
+    wrap.appendChild(btn);
   });
 
-  const cfg=document.createElement('button');
-  cfg.className='filter-tag';
-  cfg.innerHTML='⚙';
-  cfg.onclick=openPanel;
-  bar.appendChild(cfg);
+  const cfg = document.createElement('button');
+  cfg.className = 'filter-tag';
+  cfg.innerHTML = '⚙';
+  cfg.onclick = openModal;
+  wrap.appendChild(cfg);
 
-  const first=bar.querySelector('.filter-tag');
+  const first = wrap.querySelector('.filter-tag');
   if(first){ first.classList.add('active'); window.carregarSecao?.(order[0]); }
 }
 
 /* ===========================
-   SLIDING PANEL
+   MODAL
 =========================== */
-function openPanel(){
-  if(document.getElementById('ag-panel')) return;
+function openModal(){
+  if(document.getElementById('sec-modal')) return;
 
-  const panel=document.createElement('div');
-  panel.id='ag-panel';
-  panel.style.cssText=`
-    position:fixed;
-    top:0;right:0;
-    width:340px;height:100vh;
-    background:#111;
-    color:#fff;
-    z-index:9999;
-    padding:20px;
-    transform:translateX(100%);
-    transition:.4s;
-  `;
+  const modal = document.createElement('div');
+  modal.id = 'sec-modal';
+  modal.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center`;
 
-  panel.innerHTML=`
-    <h3 style="margin:0 0 10px">Personalizar Abas</h3>
-
-    <div style="display:flex;gap:10px;margin-bottom:15px">
-      <button id="mode-fixed">Fixo</button>
-      <button id="mode-dynamic">Dinâmico</button>
+  modal.innerHTML = `
+  <div style="width:90%;max-width:520px;background:#fff;padding:20px;">
+    <input id="sec-search" placeholder="Buscar seção..." style="width:100%;padding:10px;border:1px solid #ccc;margin-bottom:10px;">
+    <div id="sec-list" style="max-height:50vh;overflow:auto;"></div>
+    <div style="display:flex;gap:10px;margin-top:15px">
+      <button id="sec-save" style="flex:1;background:#c00;color:#fff;padding:10px">Salvar</button>
+      <button id="sec-close" style="flex:1">Cancelar</button>
     </div>
-
-    <input id="sec-search" placeholder="Buscar…" style="width:100%;padding:10px">
-
-    <div id="sec-list" style="margin-top:15px;max-height:70vh;overflow:auto"></div>
+  </div>
   `;
 
-  document.body.appendChild(panel);
-  requestAnimationFrame(()=>panel.style.transform='translateX(0)');
+  document.body.appendChild(modal);
 
-  document.getElementById('mode-fixed').onclick=()=>{ setMode('fixed'); };
-  document.getElementById('mode-dynamic').onclick=()=>{ setMode('dynamic'); };
+  document.getElementById('sec-close').onclick = ()=>modal.remove();
+  document.getElementById('sec-save').onclick = saveModal;
+  document.getElementById('sec-search').oninput = renderModal;
 
-  document.getElementById('sec-search').oninput=renderPanel;
-  renderPanel();
+  renderModal();
 }
 
 /* ===========================
-   PANEL LIST
+   MODAL LIST
 =========================== */
-function renderPanel(){
-  const list=document.getElementById('sec-list');
-  const q=document.getElementById('sec-search').value.toLowerCase();
-  const order=getOrder();
+function renderModal(){
+  const list = document.getElementById('sec-list');
+  const search = document.getElementById('sec-search').value.toLowerCase();
+  const order = getOrder();
 
-  list.innerHTML='';
+  list.innerHTML = '';
 
-  SECOES.filter(s=>s.nome.toLowerCase().includes(q)).forEach(sec=>{
-    const active=order.includes(sec.id);
+  SECOES.filter(s=>s.nome.toLowerCase().includes(search)).forEach(sec=>{
+    const active = order.includes(sec.id);
 
-    const row=document.createElement('div');
-    row.style.cssText='display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #333';
+    const row = document.createElement('div');
+    row.style.cssText = `display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #ddd`;
 
-    const btn=document.createElement('button');
-    btn.textContent=active?'Remover':'Adicionar';
-
-    btn.onclick=()=>{
-      let arr=getOrder();
-      if(active) arr=arr.filter(i=>i!==sec.id);
-      else if(arr.length<MAX) arr.push(sec.id);
-      save(KEY_ORDER,arr);
-      renderPanel();
-      renderBar();
+    const btn = document.createElement('button');
+    btn.textContent = active?'Remover':'Adicionar';
+    btn.onclick = ()=>{
+      let arr = getOrder();
+      if(active) arr = arr.filter(i=>i!==sec.id);
+      else if(arr.length<MAX_SECOES) arr.push(sec.id);
+      saveOrder(arr);
+      renderModal();
     };
 
-    row.innerHTML=`<span>${sec.nome}</span>`;
+    row.innerHTML = `<b>${sec.nome}</b>`;
     row.appendChild(btn);
     list.appendChild(row);
   });
 }
 
 /* ===========================
+   SALVAR
+=========================== */
+function saveModal(){
+  document.getElementById('sec-modal').remove();
+  renderBar();
+}
+
+/* ===========================
    START
 =========================== */
-document.addEventListener('DOMContentLoaded',renderBar);
+document.addEventListener('DOMContentLoaded', renderBar);
 
 })();

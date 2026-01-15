@@ -1,29 +1,12 @@
 /* scripts/auth.js */
+/* UI GLOBAL — SEM Firebase */
 
-import {
-    getAuth,
-    onAuthStateChanged,
-    signOut
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+(function () {
 
-/**
- * Usa o auth já inicializado no config-firebase.js, se existir
- * (fallback seguro para getAuth padrão)
- */
-const auth = window.auth || getAuth();
-
-/**
- * Aguarda o DOM para garantir que o elemento exista
- */
-document.addEventListener('DOMContentLoaded', () => {
-    const areaUsuario = document.getElementById('area-usuario');
-
-    if (!areaUsuario) return;
-
-    /**
-     * Renderiza interface para usuário DESLOGADO
-     */
     function renderUsuarioDeslogado() {
+        const areaUsuario = document.getElementById('area-usuario');
+        if (!areaUsuario) return;
+
         areaUsuario.innerHTML = `
             <a href="acesso.html" class="link-login">
                 Entrar / Criar conta
@@ -31,12 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
-    /**
-     * Renderiza interface para usuário LOGADO
-     */
     function renderUsuarioLogado(user) {
+        const areaUsuario = document.getElementById('area-usuario');
+        if (!areaUsuario) return;
+
         const nome =
-            user.displayName ||
+            user.nome ||
             user.email?.split('@')[0] ||
             'Usuário';
 
@@ -51,32 +34,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const btnLogout = document.getElementById('btnLogout');
         if (btnLogout) {
-            btnLogout.addEventListener('click', logoutUsuario);
+            btnLogout.addEventListener('click', () => {
+                if (window.AniGeekLogout) {
+                    window.AniGeekLogout();
+                }
+            });
         }
     }
 
-    /**
-     * Observador GLOBAL de autenticação
-     */
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            console.log("✅ Usuário logado:", user.email);
-            renderUsuarioLogado(user);
+    function aplicarEstadoInicial() {
+        if (window.AniGeekUser) {
+            renderUsuarioLogado(window.AniGeekUser);
         } else {
-            console.log("🔒 Usuário deslogado");
             renderUsuarioDeslogado();
         }
-    });
-});
-
-/**
- * Logout
- */
-async function logoutUsuario() {
-    try {
-        await signOut(auth);
-        console.log("👋 Logout realizado");
-    } catch (error) {
-        console.error("❌ Erro ao sair:", error);
     }
-}
+
+    document.addEventListener('user:login', (e) => {
+        renderUsuarioLogado(e.detail);
+    });
+
+    document.addEventListener('user:logout', () => {
+        renderUsuarioDeslogado();
+    });
+
+    document.addEventListener('DOMContentLoaded', aplicarEstadoInicial);
+
+})();

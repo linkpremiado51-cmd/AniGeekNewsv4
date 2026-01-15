@@ -1,155 +1,241 @@
 (function() {
-    // === 1. GESTÃO DE ESTADO E MONITORAMENTO ===
+    // === 1. CONFIGURAÇÃO E ESTADO ===
     let isTabActive = true;
-    let interstitialCycle = 0; // Para controlar o ciclo de 15s, 5s, 10s
+    let interstitialCycle = 0;
     document.addEventListener("visibilitychange", () => isTabActive = !document.hidden);
 
-    // === 2. CONTAINER MESTRE (ROOT) ===
     const adsRoot = document.createElement('div');
-    adsRoot.id = 'industrial-ads-system';
+    adsRoot.id = 'premium-ads-system';
     document.body.appendChild(adsRoot);
 
-    // === 3. ESTILIZAÇÃO (Editada para animações mais evidentes) ===
+    // === 2. ESTILIZAÇÃO IMPECÁVEL (ESTILO MANCHETES) ===
     const style = document.createElement('style');
     style.textContent = `
-        #industrial-ads-system { font-family: 'Helvetica', 'Arial', sans-serif; pointer-events: none; -webkit-font-smoothing: antialiased; }
-        #industrial-ads-system * { pointer-events: auto; box-sizing: border-box; }
+        #premium-ads-system { 
+            font-family: 'Inter', 'Helvetica', sans-serif; 
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Container de Banner Estilo News */
+        .premium-banner { 
+            position: fixed; 
+            left: 0; 
+            width: 100%; 
+            z-index: 2147483646; 
+            background: #ffffff; 
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.08); 
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            border-top: 1px solid #eaeaea;
+        }
+        .premium-bottom { bottom: -100%; }
+        .premium-top { top: -100%; border-top: none; border-bottom: 1px solid #eaeaea; }
         
-        /* Shimmer mais intenso */
-        .ind-shimmer { 
-            background: #111 linear-gradient(90deg, #050505 0%, #444 50%, #050505 100%); 
-            background-size: 200% 100%; 
-            animation: ind-shimmer-anim 1s infinite linear; 
+        .premium-container { 
+            max-width: 1100px; 
+            margin: 0 auto; 
+            padding: 12px 25px; 
         }
-        @keyframes ind-shimmer-anim { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-        .ind-banner { position: fixed; left: 0; width: 100%; z-index: 2147483646; background: #ffffff; border-top: 4px solid #000; border-bottom: 4px solid #000; box-shadow: 0 0 40px rgba(0,0,0,0.4); transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1); }
-        .ind-bottom { bottom: -700px; padding-bottom: 10px; }
-        .ind-top { top: -700px; }
-        .ind-container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 15px; overflow: hidden; }
-
-        .ind-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .ind-label { font-size: 12px; font-weight: 900; color: #000; text-transform: uppercase; letter-spacing: 2.5px; }
-        .ind-close-btn { font-size: 11px; font-weight: 900; background: #000; color: #fff; border: none; padding: 6px 18px; cursor: pointer; text-transform: uppercase; }
-
-        /* Slots dinâmicos Bloco 1 */
-        .ind-slot-300x250 { width: 300px; height: 250px; margin: 0 auto; border: 2px solid #000; display: block; transition: all 0.5s ease; }
-        .ind-slot-top { width: 100%; height: 90px; border: 2px solid #000; }
-
-        /* Interstitial */
-        .ind-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px) grayscale(100%); z-index: 2147483647; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.4s ease; }
-        .ind-modal { background: #fff; width: 90%; max-width: 500px; padding: 30px; border-top: 15px solid #000; box-shadow: 0 40px 100px rgba(0,0,0,1); transform: translateY(30px); transition: transform 0.4s ease; }
-        .ind-slot-hero { width: 100%; height: 300px; margin-bottom: 25px; border: 1px solid #000; }
-
-        .ind-btn-skip { background: #e0e0e0; border: 2px solid #ccc; padding: 14px 30px; font-size: 13px; font-weight: 900; color: #666; cursor: not-allowed; text-transform: uppercase; width: 100%; }
-        .ind-btn-skip.ready { background: #000; color: #fff; border-color: #000; cursor: pointer; animation: pulse-border 1.5s infinite; }
-
-        .ind-progress-bg { width: 100%; height: 8px; background: #eee; margin-bottom: 20px; }
-        .ind-progress-fill { width: 0%; height: 100%; background: #000; transition: width 0.1s linear; }
-
-        .ind-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-        .ind-cta { background: #000; color: #fff; text-decoration: none; padding: 14px 35px; font-size: 13px; font-weight: 800; text-transform: uppercase; border: 3px solid #000; transition: all 0.3s; }
-        .ind-cta:hover { background: #fff; color: #000; }
-
-        /* Pulsação mais evidente */
-        .pulse-ad { animation: ad-pulse-strong 2s infinite ease-in-out; }
-        @keyframes ad-pulse-strong { 
-            0% { opacity: 1; transform: scale(1); } 
-            50% { opacity: 0.7; transform: scale(0.97); } 
-            100% { opacity: 1; transform: scale(1); } 
+        /* Labels e Tags AdSense */
+        .ad-meta-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 8px; 
         }
-        @keyframes pulse-border {
-            0% { box-shadow: 0 0 0 0 rgba(0,0,0,0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(0,0,0,0); }
-            100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); }
+        .ad-label { 
+            font-size: 10px; 
+            font-weight: 800; 
+            color: #888; 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px; 
+        }
+        .ad-close-x { 
+            background: #f5f5f5; 
+            border: none; 
+            width: 24px; 
+            height: 24px; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            font-size: 14px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            color: #121212;
+            transition: background 0.2s;
+        }
+        .ad-close-x:hover { background: #eee; }
+
+        /* Placeholder do Anúncio (Branco Clean) */
+        .ad-slot-placeholder {
+            background: #fafafa;
+            border: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-size: 11px;
+            font-weight: 600;
+            margin: 0 auto;
+        }
+        .slot-300x250 { width: 300px; height: 250px; }
+        .slot-leaderboard { width: 100%; height: 90px; }
+
+        /* Interstitial Modal (Estilo Overlay Geek) */
+        .premium-overlay { 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(255, 255, 255, 0.98); 
+            backdrop-filter: blur(8px); 
+            z-index: 2147483647; 
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            opacity: 0; 
+            transition: opacity 0.4s ease; 
+        }
+        .premium-modal { 
+            background: #fff; 
+            width: 95%; 
+            max-width: 550px; 
+            padding: 40px; 
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            text-align: center;
+            transform: translateY(20px);
+            transition: transform 0.4s ease;
+        }
+
+        .interstitial-title { 
+            font-size: 28px; 
+            font-weight: 800; 
+            letter-spacing: -0.5px; 
+            margin-bottom: 10px; 
+            color: #121212;
+        }
+
+        /* Progress Bar Minimalista */
+        .premium-prog-bg { 
+            width: 100%; 
+            height: 4px; 
+            background: #f0f0f0; 
+            margin: 25px 0; 
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .premium-prog-fill { 
+            width: 0%; 
+            height: 100%; 
+            background: #121212; 
+            transition: width 0.1s linear; 
+        }
+
+        /* Botão Skip Estilo Artigo */
+        .btn-premium-skip { 
+            background: #f0f0f0; 
+            border: none; 
+            padding: 16px 32px; 
+            font-size: 12px; 
+            font-weight: 800; 
+            color: #aaa; 
+            cursor: not-allowed; 
+            text-transform: uppercase; 
+            border-radius: 6px;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        .btn-premium-skip.ready { 
+            background: #121212; 
+            color: #fff; 
+            cursor: pointer; 
+        }
+
+        .ad-footer-info {
+            margin-top: 20px;
+            font-size: 11px;
+            color: #888;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
     `;
     document.head.appendChild(style);
 
-    // === 4. ESTRUTURA DOS BLOCOS ===
+    // === 3. ESTRUTURA HTML ===
     adsRoot.innerHTML = `
-        <div id="ind-block-1" class="ind-banner ind-bottom">
-            <div class="ind-container">
-                <div class="ind-header">
-                    <span id="ind-label-1" class="ind-label">Oferta Patrocinada</span>
-                    <button id="ind-close-1" class="ind-close-btn">Fechar</button>
+        <div id="p-block-1" class="premium-banner premium-bottom">
+            <div class="premium-container">
+                <div class="ad-meta-header">
+                    <span class="ad-label">Anúncio Recomendado</span>
+                    <button id="p-close-1" class="ad-close-x">×</button>
                 </div>
-                <div id="ind-slot-1" class="ind-slot-300x250 ind-shimmer pulse-ad"></div>
+                <div id="p-slot-1" class="ad-slot-placeholder slot-300x250">ANÚNCIO PUBLICITÁRIO</div>
             </div>
         </div>
 
-        <div id="ind-block-2-overlay" class="ind-overlay">
-            <div class="ind-modal">
-                <div class="ind-header">
-                    <span class="ind-label">Publicidade Premium</span>
-                    <button id="ind-close-2" class="ind-btn-skip" disabled>Aguarde</button>
+        <div id="p-block-2-overlay" class="premium-overlay">
+            <div class="premium-modal">
+                <span class="ad-label" style="display:block; margin-bottom:15px;">Publicidade Patrocinada</span>
+                <h2 class="interstitial-title">Conteúdo Exclusivo</h2>
+                <p style="color:#666; font-size:14px;">Aguarde alguns segundos para prosseguir para o artigo.</p>
+                
+                <div class="ad-slot-placeholder" style="width:100%; height:250px; margin: 20px 0;">
+                    ESPAÇO PARA PUBLICIDADE PREMIUM
                 </div>
-                <div class="ind-slot-hero ind-shimmer pulse-ad"></div>
-                <div class="ind-progress-bg"><div id="ind-prog-2" class="ind-progress-fill"></div></div>
-                <div class="ind-footer">
-                    <span id="ind-timer-txt" style="font-size:11px; font-weight:900; color:#000;">AGUARDE...</span>
-                    <a href="#" target="_blank" class="ind-cta">Visitar Site</a>
+
+                <div class="premium-prog-bg"><div id="p-prog-2" class="premium-prog-fill"></div></div>
+                
+                <button id="p-close-2" class="btn-premium-skip" disabled>Aguarde</button>
+                
+                <div class="ad-footer-info">
+                    <span id="p-timer-txt">SINCRONIZANDO...</span>
+                    <span style="font-weight:700; color:#121212; cursor:pointer;">Privacidade do Anúncio</span>
                 </div>
             </div>
         </div>
 
-        <div id="ind-block-3" class="ind-banner ind-top">
-            <div class="ind-container">
-                <div class="ind-header">
-                    <span class="ind-label">Destaque Informativo</span>
-                    <button id="ind-close-3" class="ind-close-btn">Fechar</button>
+        <div id="p-block-3" class="premium-banner premium-top">
+            <div class="premium-container">
+                <div class="ad-meta-header">
+                    <span class="ad-label">Destaque Parceiro</span>
+                    <button id="p-close-3" class="ad-close-x">×</button>
                 </div>
-                <div class="ind-slot-top ind-shimmer pulse-ad"></div>
+                <div class="ad-slot-placeholder slot-leaderboard">728 x 90 LEADERBOARD</div>
             </div>
         </div>
     `;
 
-    const b1 = document.getElementById('ind-block-1');
-    const s1 = document.getElementById('ind-slot-1');
-    const b2Overlay = document.getElementById('ind-block-2-overlay');
-    const b2Modal = b2Overlay.querySelector('.ind-modal');
-    const b3 = document.getElementById('ind-block-3');
+    const b1 = document.getElementById('p-block-1');
+    const s1 = document.getElementById('p-slot-1');
+    const b2Overlay = document.getElementById('p-block-2-overlay');
+    const b2Modal = b2Overlay.querySelector('.premium-modal');
+    const b3 = document.getElementById('p-block-3');
 
-    // === 5. LÓGICA BLOCO 1 (Mutação Horizontal) ===
-    let b1Timer;
-    let b1MutationTimer;
+    // === 4. LÓGICA DE EXIBIÇÃO ===
 
     const openB1 = () => {
         b1.style.bottom = '0px';
-        s1.className = 'ind-slot-300x250 ind-shimmer pulse-ad';
-        document.getElementById('ind-label-1').innerText = "Oferta Patrocinada";
-        
-        // Timer de 20 segundos para deslizar e trocar para horizontal
-        b1MutationTimer = setTimeout(() => {
-            b1.style.bottom = '-700px'; // Desliza para baixo
+        // Mutação de formato após 15s (300x250 -> 728x90)
+        setTimeout(() => {
+            b1.style.bottom = '-100%';
             setTimeout(() => {
-                s1.className = 'ind-slot-top ind-shimmer pulse-ad'; // Muda para horizontal
-                document.getElementById('ind-label-1').innerText = "Troca de Propaganda";
-                b1.style.bottom = '0px'; // Sobe novamente
-                
-                // Em 60 segundos retorna ao estado 300x250
-                setTimeout(() => {
-                    b1.style.bottom = '-700px';
-                    setTimeout(openB1, 1000);
-                }, 60000);
+                s1.className = 'ad-slot-placeholder slot-leaderboard';
+                b1.style.bottom = '0px';
             }, 800);
-        }, 20000);
+        }, 15000);
     };
 
-    document.getElementById('ind-close-1').onclick = () => {
-        clearTimeout(b1MutationTimer);
-        b1.style.bottom = '-700px';
-        setTimeout(openB1, 80000);
+    document.getElementById('p-close-1').onclick = () => {
+        b1.style.bottom = '-100%';
+        setTimeout(openB1, 60000);
     };
 
-    // === 6. LÓGICA BLOCO 3 (Superior) ===
     const openB3 = () => { b3.style.top = '0px'; };
-    document.getElementById('ind-close-3').onclick = () => {
-        b3.style.top = '-700px';
-        setTimeout(openB3, 40000);
+    document.getElementById('p-close-3').onclick = () => {
+        b3.style.top = '-100%';
+        setTimeout(openB3, 45000);
     };
 
-    // === 7. LÓGICA BLOCO 2 (Interstitial com Ciclo 15-5-10) ===
     function startInterstitial() {
         setTimeout(() => {
             b2Overlay.style.display = 'flex';
@@ -158,53 +244,45 @@
                 b2Modal.style.transform = 'translateY(0)';
             }, 50);
 
-            // Definição do tempo baseado no ciclo
-            const cycleTimes = [15, 5, 10];
+            const cycleTimes = [10, 5, 15];
             let timeLeft = cycleTimes[interstitialCycle % 3];
             const totalDuration = timeLeft;
             
-            const btn = document.getElementById('ind-close-2');
-            const prog = document.getElementById('ind-prog-2');
-            const txt = document.getElementById('ind-timer-txt');
-            
-            btn.disabled = true;
-            btn.classList.remove('ready');
-            btn.innerText = "Aguarde";
+            const btn = document.getElementById('p-close-2');
+            const prog = document.getElementById('p-prog-2');
+            const txt = document.getElementById('p-timer-txt');
 
             const countdown = setInterval(() => {
                 if (isTabActive) {
                     if (timeLeft > 0) {
                         timeLeft--;
-                        txt.innerText = `ACESSO LIBERADO EM ${timeLeft}S`;
+                        txt.innerText = `PROSSEGUIR EM ${timeLeft}S`;
                         prog.style.width = `${((totalDuration - timeLeft) / totalDuration) * 100}%`;
                     } else {
                         clearInterval(countdown);
-                        txt.innerText = "ACESSO DISPONÍVEL";
-                        btn.innerText = "PULAR ANÚNCIO";
+                        txt.innerText = "PRONTO PARA SEGUIR";
+                        btn.innerText = "PULAR PUBLICIDADE";
                         btn.disabled = false;
                         btn.classList.add('ready');
                     }
-                } else {
-                    txt.innerText = "CONTAGEM PAUSADA";
                 }
             }, 1000);
 
             btn.onclick = () => {
-                interstitialCycle++; // Incrementa o ciclo para a próxima exibição
+                interstitialCycle++;
                 b2Overlay.style.opacity = '0';
-                b2Modal.style.transform = 'translateY(30px)';
+                b2Modal.style.transform = 'translateY(20px)';
                 setTimeout(() => {
                     b2Overlay.style.display = 'none';
-                    setTimeout(startInterstitial, 130000); // Reaparece em 130s
+                    setTimeout(startInterstitial, 120000);
                 }, 500);
-                prog.style.width = "0%";
             };
-        }, 40000); // Delay inicial de 40 segundos
+        }, 30000);
     }
 
-    // === 8. INICIALIZAÇÃO GERAL ===
-    setTimeout(openB1, 10000); // Bloco 1: 10s
-    setTimeout(openB3, 7000);  // Bloco 3: 7s
-    startInterstitial();       // Bloco 2: 40s (dentro da função)
+    // === 5. START ===
+    setTimeout(openB1, 4000);
+    setTimeout(openB3, 2000);
+    startInterstitial();
 
 })();

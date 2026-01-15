@@ -537,36 +537,74 @@ const styles = `
   @keyframes agFadeOut {
     to { opacity: 0; transform: translateY(-10px); }
   }
-     /* --- AJUSTE PARA BOTÃO TOTALMENTE À DIREITA --- */
+     /* --- AJUSTE PARA BOTÃO PROFISSIONAL E FIXO --- */
   #filterScroller {
     display: flex;
     align-items: center;
-    /* Reduzido para 44px (largura do botão) para a última aba encostar nele sem sobrar espaço */
-    padding-right: 44px !important; 
     position: relative;
-    gap: 5px; /* Espaço entre as abas */
+    gap: 8px;
+    padding-right: 0 !important;
+    overflow-x: auto;
+    scrollbar-width: none; /* Esconde scroll no Firefox */
   }
+  #filterScroller::-webkit-scrollbar { display: none; } /* Esconde scroll no Chrome/Safari */
 
   .filter-tag.cfg-btn {
     position: sticky;
-    right: -1px; /* Valor negativo ou zero cola ele na borda da tela/contêiner */
-    z-index: 10;
-    background: #fff;
-    margin-left: 0; /* Remove margens que podem afastar o botão */
-    margin-right: -10px; /* Puxa o botão um pouco mais para a extremidade se necessário */
-    box-shadow: -5px 0 10px rgba(0,0,0,0.05); 
-    border-radius: 4px; /* Ajuste o arredondamento conforme seu gosto */
-    min-width: 44px;
-    height: 38px;
+    right: 0 !important;
+    z-index: 99;
+    
+    /* Estética Profissional: Glassmorphism */
+    background: rgba(255, 255, 255, 0.9); 
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    
+    min-width: 48px;
+    height: 34px;
+    margin-left: auto;
     display: flex;
     align-items: center;
     justify-content: center;
+    
+    /* Borda e Sombra refinadas */
+    border: none;
+    border-left: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: -10px 0 20px rgba(0, 0, 0, 0.05);
+    
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.3s ease;
   }
 
-  body.dark-mode .filter-tag.cfg-btn {
-    background: #141414;
-    box-shadow: -5px 0 10px rgba(0,0,0,0.5);
+  /* Efeito de degradê para as abas sumirem suavemente atrás do botão */
+  .filter-tag.cfg-btn::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 0;
+    width: 20px;
+    height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.9));
+    pointer-events: none;
   }
+
+  /* Ajustes para o Dark Mode */
+  body.dark-mode .filter-tag.cfg-btn {
+    background: rgba(20, 20, 20, 0.9);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: -15px 0 25px rgba(0, 0, 0, 0.5);
+  }
+
+  body.dark-mode .filter-tag.cfg-btn::before {
+    background: linear-gradient(to right, transparent, rgba(20, 20, 20, 0.9));
+  }
+
+  /* Feedback visual ao tocar/clicar */
+  .filter-tag.cfg-btn:active {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+
 
 
 `;

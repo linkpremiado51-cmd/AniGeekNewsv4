@@ -19,28 +19,47 @@ export async function inicializarMegaMenu() {
     const overlay = document.getElementById('megaOverlay');
     const btnFechar = document.getElementById('btnFecharMega');
 
-    window.abrirMegaMenu = () => {
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    };
+    if (!overlay || !btnFechar) return;
 
+    /* =========================================
+       FUNÇÃO CENTRAL DE FECHAMENTO
+       ========================================= */
     const fecharMegaMenu = () => {
         overlay.classList.remove('active');
         document.body.style.overflow = '';
     };
 
+    /* =========================================
+       TOGGLE PELO BOTÃO QUE ABRE O MENU
+       ========================================= */
+    window.abrirMegaMenu = () => {
+        const menuAberto = overlay.classList.contains('active');
+
+        if (menuAberto) {
+            fecharMegaMenu();
+        } else {
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    };
+
+    /* =========================================
+       BOTÃO X
+       ========================================= */
     btnFechar.onclick = fecharMegaMenu;
 
+    /* =========================================
+       CLICK FORA DO CONTEÚDO
+       ========================================= */
     overlay.onclick = (e) => {
         if (e.target === overlay) {
             fecharMegaMenu();
         }
     };
 
-    /* =====================================================
-       🔥 CONEXÃO DO MEGA MENU COM carregarSecao()
-       ===================================================== */
-
+    /* =========================================
+       CONEXÃO COM carregarSecao()
+       ========================================= */
     const linksSecao = overlay.querySelectorAll('[data-secao]');
 
     linksSecao.forEach(link => {
@@ -50,15 +69,11 @@ export async function inicializarMegaMenu() {
             const secao = link.dataset.secao;
             if (!secao) return;
 
-            // Usa o motor principal do site
             if (typeof window.carregarSecao === 'function') {
                 window.carregarSecao(secao);
             }
 
-            // Fecha o Mega Menu
             fecharMegaMenu();
-
-            // Scroll para o topo
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     });

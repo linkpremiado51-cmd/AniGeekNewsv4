@@ -7,9 +7,10 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 /**
- * Usa o app já inicializado no config-firebase.js
+ * Usa o auth já inicializado no config-firebase.js, se existir
+ * (fallback seguro para getAuth padrão)
  */
-const auth = getAuth();
+const auth = window.auth || getAuth();
 
 /**
  * Aguarda o DOM para garantir que o elemento exista
@@ -79,8 +80,3 @@ async function logoutUsuario() {
         console.error("❌ Erro ao sair:", error);
     }
 }
-
-/**
- * Exposição controlada (para uso futuro)
- */
-window.auth = auth;

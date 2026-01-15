@@ -23,7 +23,7 @@
 }
 
 /* ===============================
-   🔥 ÁREA DO USUÁRIO (NOVA)
+   🔥 ÁREA DO USUÁRIO
 ================================ */
 .mega-user-area {
     max-width: 1200px;
@@ -38,25 +38,40 @@
     height: 140px;
     background: linear-gradient(135deg, #111, #333);
     margin-bottom: 20px;
+    border-radius: 6px;
 }
 
-/* Área de autenticação */
+/* ===============================
+   🔐 ESTADOS DE AUTENTICAÇÃO
+================================ */
 .user-auth {
     text-align: center;
 }
 
+/* Garante consistência visual */
+.user-auth[data-auth="logged-in"] {
+    display: none;
+}
+
+.user-auth[data-auth="logged-out"] {
+    display: block;
+}
+
+/* Mensagem */
 .user-msg {
     font-size: 14px;
     margin-bottom: 15px;
     color: var(--text-muted);
 }
 
+/* Ações */
 .user-actions {
     display: flex;
     justify-content: center;
     gap: 12px;
 }
 
+/* Botões */
 .btn-login,
 .btn-signup {
     padding: 10px 18px;
@@ -67,6 +82,7 @@
     text-transform: uppercase;
     font-size: 11px;
     letter-spacing: 1px;
+    transition: all 0.2s ease;
 }
 
 .btn-login:hover,
@@ -76,9 +92,16 @@
     border-color: var(--accent-news);
 }
 
-/* Usuário logado */
+/* ===============================
+   👤 USUÁRIO LOGADO
+================================ */
 .user-welcome {
     font-size: 14px;
+    color: var(--text-main);
+}
+
+.user-welcome strong {
+    font-weight: 800;
 }
 
 /* ===============================
@@ -126,7 +149,9 @@
     text-decoration: underline;
 }
 
-/* Botão fechar */
+/* ===============================
+   BOTÃO FECHAR
+================================ */
 .close-mega {
     position: fixed;
     top: 150px;
@@ -139,7 +164,9 @@
     z-index: 3100;
 }
 
-/* Extras */
+/* ===============================
+   EXTRAS
+================================ */
 .menu-highlight p,
 .promo-box p {
     font-size: 12px;

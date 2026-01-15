@@ -53,9 +53,9 @@ loginBtn?.addEventListener('click', async () => {
  * CADASTRO
  */
 signupBtn?.addEventListener('click', async () => {
-    const nome = document.getElementById('nome')?.value.trim();
-    const email = document.getElementById('email')?.value.trim();
-    const senha = document.getElementById('senha')?.value;
+    const nome = document.getElementById('signup-nome')?.value.trim();
+    const email = document.getElementById('signup-email')?.value.trim();
+    const senha = document.getElementById('signup-senha')?.value;
 
     if (!nome || !email || !senha) {
         mensagem.textContent = 'Preencha todos os campos.';

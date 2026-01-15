@@ -15,147 +15,150 @@
     <link rel="stylesheet" href="estilos/cabecalho-rodape.css">
     <link rel="stylesheet" href="estilos/componentes.css">
 </head>
+
 <body>
 
-    <div id="progress-bar"></div>
+<div id="progress-bar"></div>
 
-    <!-- CONTAINER DO MEGA MENU -->
-    <div id="megaMenuContainer"></div>
+<!-- CONTAINER DO MEGA MENU -->
+<div id="megaMenuContainer"></div>
 
-    <div class="sticky-header-group">
-        <header>
-            <div class="nav-container">
-                <a href="./index.html" class="logo">AniGeeknews.com<span></span></a>
+<div class="sticky-header-group">
+    <header>
+        <div class="nav-container">
+            <a href="./index.html" class="logo">AniGeeknews.com<span></span></a>
 
-                <ul class="nav-menu">
-                    <li class="nav-item"><a href="#">Animes</a></li>
-                    <li class="nav-item"><a href="#">Games</a></li>
-                    <li class="nav-item"><a href="#">Mangás</a></li>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#">Animes</a></li>
+                <li class="nav-item"><a href="#">Games</a></li>
+                <li class="nav-item"><a href="#">Mangás</a></li>
 
-                    <!-- ÁREA DO USUÁRIO (AUTH VAI ATUAR AQUI) -->
-                    <li class="nav-item" id="area-usuario">
-                        <span>Aguardando...</span>
-                    </li>
-                </ul>
+                <!-- ÁREA DO USUÁRIO -->
+                <li class="nav-item" id="area-usuario">
+                    <span>Aguardando...</span>
+                </li>
+            </ul>
 
-                <!-- BOTÃO DO MEGA MENU -->
-                <button class="menu-toggle" onclick="abrirMegaMenu()" aria-label="Abrir menu">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-        </header>
-
-        <div class="search-bar-wrapper">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input
-                    type="text"
-                    id="input-busca-global"
-                    placeholder="Pesquisar notícias, animes ou análises..."
-                    autocomplete="off"
-                >
-            </div>
-            <div id="search-results-surface"></div>
-        </div>
-
-        <div class="filter-scroller" id="filterScroller"></div>
-    </div>
-
-    <main id="dynamic-content">
-        <section class="hero">
-            <div id="conteudo_de_destaque">
-                <p style="text-align:center; padding-top:100px; color:var(--text-muted);">
-                    Iniciando portal...
-                </p>
-            </div>
-        </section>
-
-        <div class="newsletter-card">
-            <h3>Briefing Matinal</h3>
-            <p style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">
-                Curadoria das notícias mais importantes.
-            </p>
-            <input
-                type="email"
-                placeholder="seu@email.com"
-                style="width:100%; padding:10px; margin:10px 0; border:1px solid var(--border); background:var(--bg); color:var(--text-main);"
-            >
-            <button
-                style="width:100%; padding:12px; background:var(--text-main); color:var(--bg); border:none; cursor:pointer; font-weight:bold;"
-            >
-                ASSINAR BRIEFING
+            <button class="menu-toggle" onclick="abrirMegaMenu()" aria-label="Abrir menu">
+                <i class="fas fa-bars"></i>
             </button>
         </div>
-    </main>
+    </header>
 
-    <footer>
-        <div style="max-width:var(--container-w); margin:0 auto;">
-            <a href="./index.html" class="logo" style="font-size:20px;">AniGeek<span>News</span></a>
-            <p style="margin-top:10px;">© 2025 AniGeekNews. Jornalismo Geek Independente.</p>
+    <div class="search-bar-wrapper">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input
+                type="text"
+                id="input-busca-global"
+                placeholder="Pesquisar notícias, animes ou análises..."
+                autocomplete="off"
+            >
         </div>
-    </footer>
-
-    <!-- MODAL GLOBAL -->
-    <div id="modal-noticia-global"
-         style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:99999; overflow-y:auto; backdrop-filter:blur(8px);">
-        <div id="modal-conteudo-interno"
-             style="background:var(--bg); color:var(--text-main); max-width:900px; margin:20px auto; padding:25px; border-radius:12px; position:relative;">
-            <button onclick="window.fecharModalGlobal()"
-                    style="position:absolute; top:15px; right:15px; border:none; background:rgba(0,0,0,0.05); width:35px; height:35px; border-radius:50%; font-size:20px; cursor:pointer;">×</button>
-
-            <div id="m-categoria"></div>
-            <h2 id="m-titulo"></h2>
-            <p id="m-resumo"></p>
-            <div id="m-ficha"></div>
-            <iframe id="m-video" allowfullscreen></iframe>
-
-            <div style="margin-top:25px; text-align:center;">
-                <a id="m-link" target="_blank">Ver Artigo Completo</a>
-            </div>
-        </div>
+        <div id="search-results-surface"></div>
     </div>
 
-    <!-- SCRIPTS PRINCIPAIS -->
-    <script type="module" src="scripts/config-firebase.js"></script>
+    <div class="filter-scroller" id="filterScroller"></div>
+</div>
 
-    <!-- 🔑 AUTH (ADICIONADO – NÃO REMOVE NADA) -->
-    <script type="module" src="scripts/auth.js"></script>
+<main id="dynamic-content">
+    <section class="hero">
+        <div id="conteudo_de_destaque">
+            <p style="text-align:center; padding-top:100px; color:var(--text-muted);">
+                Iniciando portal...
+            </p>
+        </div>
+    </section>
 
-    <script type="module" src="scripts/tema.js"></script>
-    <script type="module" src="scripts/navegacao.js"></script>
-    <script type="module" src="scripts/busca.js"></script>
-    <script src="scripts/recomendacao-secao.js"></script>
-    <script type="module" src="scripts/config-firebase.js"></script>
-<script type="module" src="scripts/acesso.js"></script>
+    <div class="newsletter-card">
+        <h3>Briefing Matinal</h3>
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">
+            Curadoria das notícias mais importantes.
+        </p>
 
-    <!-- MEGA MENU (MÓDULO ÚNICO) -->
-    <script type="module">
-        import { inicializarMegaMenu } from './menu/menu.js';
-        inicializarMegaMenu();
-    </script>
+        <input
+            type="email"
+            placeholder="seu@email.com"
+            style="width:100%; padding:10px; margin:10px 0; border:1px solid var(--border); background:var(--bg); color:var(--text-main);"
+        >
 
-    <!-- MODAL GLOBAL -->
-    <script>
-        window.abrirModalNoticia = (noticia) => {
-            const modal = document.getElementById('modal-noticia-global');
-            if (!modal) return;
+        <button
+            style="width:100%; padding:12px; background:var(--text-main); color:var(--bg); border:none; cursor:pointer; font-weight:bold;"
+        >
+            ASSINAR BRIEFING
+        </button>
+    </div>
+</main>
 
-            document.getElementById('m-categoria').innerText = noticia.categoria || "Geek";
-            document.getElementById('m-titulo').innerText = noticia.titulo;
-            document.getElementById('m-resumo').innerText = noticia.resumo || "";
-            document.getElementById('m-video').src = noticia.videoPrincipal || "";
-            document.getElementById('m-link').href = noticia.linkArtigo || "#";
+<footer>
+    <div style="max-width:var(--container-w); margin:0 auto;">
+        <a href="./index.html" class="logo" style="font-size:20px;">AniGeek<span>News</span></a>
+        <p style="margin-top:10px;">© 2025 AniGeekNews. Jornalismo Geek Independente.</p>
+    </div>
+</footer>
 
-            modal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        };
+<!-- MODAL GLOBAL -->
+<div id="modal-noticia-global"
+     style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:99999; overflow-y:auto; backdrop-filter:blur(8px);">
+    <div id="modal-conteudo-interno"
+         style="background:var(--bg); color:var(--text-main); max-width:900px; margin:20px auto; padding:25px; border-radius:12px; position:relative;">
+        <button onclick="window.fecharModalGlobal()"
+                style="position:absolute; top:15px; right:15px; border:none; background:rgba(0,0,0,0.05); width:35px; height:35px; border-radius:50%; font-size:20px; cursor:pointer;">×</button>
 
-        window.fecharModalGlobal = () => {
-            document.getElementById('modal-noticia-global').style.display = 'none';
-            document.getElementById('m-video').src = "";
-            document.body.style.overflow = 'auto';
-        };
-    </script>
+        <div id="m-categoria"></div>
+        <h2 id="m-titulo"></h2>
+        <p id="m-resumo"></p>
+        <div id="m-ficha"></div>
+        <iframe id="m-video" allowfullscreen></iframe>
+
+        <div style="margin-top:25px; text-align:center;">
+            <a id="m-link" target="_blank">Ver Artigo Completo</a>
+        </div>
+    </div>
+</div>
+
+<!-- ================= SCRIPTS ================= -->
+
+<!-- Firebase (APENAS UMA VEZ) -->
+<script type="module" src="scripts/config-firebase.js"></script>
+
+<!-- Auth global -->
+<script type="module" src="scripts/auth.js"></script>
+
+<!-- Scripts do site -->
+<script type="module" src="scripts/tema.js"></script>
+<script type="module" src="scripts/navegacao.js"></script>
+<script type="module" src="scripts/busca.js"></script>
+<script src="scripts/recomendacao-secao.js"></script>
+
+<!-- Mega Menu -->
+<script type="module">
+    import { inicializarMegaMenu } from './menu/menu.js';
+    inicializarMegaMenu();
+</script>
+
+<!-- Modal -->
+<script>
+    window.abrirModalNoticia = (noticia) => {
+        const modal = document.getElementById('modal-noticia-global');
+        if (!modal) return;
+
+        document.getElementById('m-categoria').innerText = noticia.categoria || "Geek";
+        document.getElementById('m-titulo').innerText = noticia.titulo;
+        document.getElementById('m-resumo').innerText = noticia.resumo || "";
+        document.getElementById('m-video').src = noticia.videoPrincipal || "";
+        document.getElementById('m-link').href = noticia.linkArtigo || "#";
+
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.fecharModalGlobal = () => {
+        document.getElementById('modal-noticia-global').style.display = 'none';
+        document.getElementById('m-video').src = "";
+        document.body.style.overflow = 'auto';
+    };
+</script>
 
 </body>
 </html>

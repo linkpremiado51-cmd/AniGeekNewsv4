@@ -16,13 +16,24 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// --- UNIFICAÇÃO GLOBAL PARA A BUSCA E MODAL ---
 window.noticiasFirebase = [];
-let linkProcessado = false; // Evita que o modal fique reabrindo sozinho em updates do Firebase
+let linkProcessado = false;
 
 /**
- * Verifica se há um ID na URL e abre o modal se a notícia for encontrada.
+ * Normaliza os dados para garantir que a imagem sempre funcione,
+ * não importa se o campo no Firebase se chama 'capa', 'thumb' ou 'imagem'.
  */
+function normalizarNoticia(doc, nomeColecao) {
+    const data = doc.data();
+    return {
+        id: doc.id,
+        origem: nomeColecao,
+        ...data,
+        // Garante que 'thumb' sempre tenha uma URL válida para a busca e modal
+        thumb: data.thumb || data.capa || data.imagem || 'https://anigeeknews.com/default-og.jpg'
+    };
+}
+
 window.verificarGatilhoDeLink = function() {
     const urlParams = new URLSearchParams(window.location.search);
     const idDesejado = urlParams.get('id');
@@ -31,67 +42,31 @@ window.verificarGatilhoDeLink = function() {
         const noticiaEncontrada = window.noticiasFirebase.find(n => n.id === idDesejado);
         
         if (noticiaEncontrada && typeof window.abrirModalNoticia === 'function') {
-            console.log("🎯 Link detectado! Abrindo modal para:", idDesejado);
             window.abrirModalNoticia(noticiaEncontrada);
             linkProcessado = true; 
         }
     }
 };
 
-/**
- * Sincronização inteligente multisseção
- */
 function sincronizarComBusca(nomeColecao) {
-    try {
-        onSnapshot(collection(db, nomeColecao), (snapshot) => {
-            // 1. Remove apenas os dados dessa coleção
-            window.noticiasFirebase = window.noticiasFirebase.filter(item => item.origem !== nomeColecao);
-            
-            // 2. Injeta os novos dados
-            const novosDados = snapshot.docs.map(doc => ({ 
-                id: doc.id, 
-                origem: nomeColecao, 
-                ...doc.data() 
-            }));
-            
-            window.noticiasFirebase.push(...novosDados);
-            
-            // 3. Ordena tudo por data
-            window.noticiasFirebase.sort((a, b) => (b.data || 0) - (a.data || 0));
-            
-            console.log(`✅ [Firebase] Sincronizado: ${nomeColecao}`);
+    onSnapshot(collection(db, nomeColecao), (snapshot) => {
+        // Remove dados antigos daquela coleção específica para evitar duplicatas
+        window.noticiasFirebase = window.noticiasFirebase.filter(item => item.origem !== nomeColecao);
+        
+        // Mapeia e normaliza os novos dados
+        const novosDados = snapshot.docs.map(doc => normalizarNoticia(doc, nomeColecao));
+        
+        window.noticiasFirebase.push(...novosDados);
+        
+        // Reordena por data (se o campo 'data' existir)
+        window.noticiasFirebase.sort((a, b) => (b.data || 0) - (a.data || 0));
 
-            // 4. Gatilho de link
-            if (!linkProcessado) {
-                window.verificarGatilhoDeLink();
-            }
-
-        }, (error) => {
-            console.error(`❌ Erro ao sincronizar ${nomeColecao}:`, error);
-        });
-    } catch (err) {
-        console.error(`⚠️ Falha ao inicializar coleção ${nomeColecao}:`, err);
-    }
+        if (!linkProcessado) window.verificarGatilhoDeLink();
+        
+    }, (error) => console.error("Erro Firebase:", error));
 }
 
-// Expõe para as páginas de seção
-window.db = db;
-window.collection = collection;
-window.onSnapshot = onSnapshot;
-
-// 🔥 COLEÇÕES ATIVAS (AGORA COM FUTEBOL)
-const colecoesParaMonitorar = [
-    "noticias",
-    "lancamentos",
-    "analises",
-    "entrevistas",
-    "podcast",
-    "futebol"
-];
-
+const colecoesParaMonitorar = ["noticias", "lancamentos", "analises", "entrevistas", "podcast", "futebol"];
 colecoesParaMonitorar.forEach(nome => sincronizarComBusca(nome));
 
-// Escuta navegação do navegador (voltar / avançar)
 window.addEventListener('popstate', window.verificarGatilhoDeLink);
-
-console.log("🔥 Motor AniGeekNews v2: Sincronização e Gatilhos ativados.");

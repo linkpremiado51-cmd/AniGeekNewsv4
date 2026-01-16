@@ -1,146 +1,152 @@
 /* estilos/modal-pesquisa.css */
 
-/* Overlay com desfoque profundo e elegante */
+/* Overlay - Efeito Glassmorphism Puro */
 #modal-noticia-global {
     display: none;
     position: fixed;
-    z-index: 10000;
     inset: 0;
-    background-color: rgba(10, 10, 10, 0.85); /* Preto profundo */
-    overflow-y: auto;
-    backdrop-filter: blur(12px); /* Desfoque mais intenso */
-    padding: 40px 20px;
-    transition: all 0.4s ease;
+    z-index: 10000;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    padding: 0; /* Removido padding para preencher a tela */
+    overflow: hidden; /* Proibido rolar a página principal */
 }
 
-/* Container principal com design de "Cartão de Crédito Black" */
+/* Container Principal - Ocupa quase toda a tela sem rolar */
 #modal-noticia-global .modal-content {
-    background: #ffffff; 
-    color: #121212;
-    max-width: 850px;
-    margin: 0 auto;
-    padding: 60px; /* Mais espaço para "respirar" */
-    border-radius: 4px; /* Bordas mais retas transmitem seriedade */
-    position: relative;
-    font-family: 'Inter', sans-serif;
-    box-shadow: 0 40px 100px rgba(0,0,0,0.5);
-    border-top: 5px solid #ff0000; /* Detalhe premium no topo */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 95vw;
+    height: 85vh;
+    background: #0a0a0a; /* Fundo Dark Premium */
+    display: flex; /* Layout Lado a Lado */
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
-/* Botão Fechar Minimalista */
-#modal-noticia-global .close-modal {
+/* Lado Esquerdo: O "Hook" Visual (Vídeo/Trailer) */
+.modal-visual-side {
+    flex: 1.2;
+    background: #000;
+    position: relative;
+}
+
+#m-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: none;
+}
+
+/* Lado Direito: A Inteligência da Notícia */
+.modal-info-side {
+    flex: 1;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centraliza tudo verticalmente */
+    background: linear-gradient(135deg, #111 0%, #050505 100%);
+    position: relative;
+    border-left: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Botão Fechar Flutuante Ultra-Minimalista */
+.close-modal {
     position: absolute;
-    top: 25px;
-    right: 25px;
-    background: transparent;
-    border: 1px solid #eee;
-    width: 40px;
-    height: 40px;
+    top: 30px;
+    right: 30px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
-    font-size: 22px;
     cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #999;
-    transition: all 0.3s ease;
 }
+.close-modal:hover { background: #ff0000; border-color: #ff0000; transform: rotate(90deg); }
 
-#modal-noticia-global .close-modal:hover { 
-    background: #121212; 
-    color: #fff;
-    border-color: #121212;
-    transform: rotate(90deg);
-}
-
-/* Categoria com espaçamento de letra elegante */
+/* Tipografia Estilo Google News */
 #m-categoria {
-    color: #ff0000; /* Vermelho Executivo */
-    font-size: 10px; 
-    font-weight: 700; 
-    text-transform: uppercase; 
-    letter-spacing: 4px; /* Letras bem espaçadas */
-    margin-bottom: 20px; 
-    display: flex; 
-    align-items: center; 
-    gap: 8px;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--tema-cor, #ff0000);
+    margin-bottom: 20px;
 }
 
-/* Título Impactante (Estilo New York Times Moderno) */
 #m-titulo {
-    font-family: 'Inter', sans-serif;
-    font-size: clamp(28px, 5vw, 42px); 
-    font-weight: 800; 
-    line-height: 1.05; 
-    letter-spacing: -1.5px; 
-    margin: 0 0 20px 0;
-    color: #1a1a1a;
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 800;
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: 20px;
+    letter-spacing: -2px;
 }
 
-/* Resumo com cor suave para melhor leitura */
 #m-resumo {
-    font-size: 18px; 
-    line-height: 1.7; 
-    color: #555; 
-    margin-bottom: 35px;
-    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #aaa;
+    margin-bottom: 40px;
+    display: -webkit-box;
+    -webkit-line-clamp: 4; /* Limita o texto para não criar scroll */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-/* Ficha Técnica: Design de Grid Industrial */
+/* Ficha Técnica Estilo "Tech Spec" */
 #m-ficha {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 30px; 
-    background: #fdfdfd; 
-    padding: 25px;
-    border: 1px solid #f0f0f0; /* Borda fina em vez de fundo sólido */
-    border-left: 4px solid #121212; 
-    margin-bottom: 35px;
-}
-
-.info-item { display: flex; flex-direction: column; gap: 6px; }
-.info-label { font-size: 9px; text-transform: uppercase; font-weight: 800; color: #aaa; letter-spacing: 1px; }
-.info-valor { font-size: 14px; font-weight: 700; color: #121212; }
-
-/* Vídeo com sombra suave */
-#m-video {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    border: none;
-    border-radius: 2px;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
     margin-bottom: 40px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 20px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
 }
 
-/* BOTÃO EXECUTIVO VERMELHO: O Teste solicitado */
-.btn-ver-artigo-modal { 
-    display: inline-flex; 
-    align-items: center; 
+.info-item { display: flex; flex-direction: column; }
+.info-label { font-size: 10px; color: #555; text-transform: uppercase; font-weight: 800; margin-bottom: 5px; }
+.info-valor { font-size: 14px; color: #eee; font-weight: 600; }
+
+/* Botão CTA Vermelho com Brilho Dinâmico (Executivo Google) */
+.btn-ver-artigo-modal {
+    display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 12px; 
+    gap: 15px;
+    background: #ff0000;
     color: #fff;
-    background: #ff0000; /* Vermelho solicitado */
-    text-decoration: none; 
-    font-size: 12px; 
-    font-weight: 900; 
-    text-transform: uppercase; 
+    text-decoration: none;
+    padding: 22px;
+    font-size: 14px;
+    font-weight: 900;
     letter-spacing: 2px;
-    padding: 20px 45px;
-    border-radius: 0px; /* Pontas secas são mais executivas */
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    box-shadow: 0 4px 0px #b30000; /* Sombra sólida inferior */
+    border-radius: 12px;
+    transition: all 0.4s ease;
+    box-shadow: 0 10px 30px rgba(255, 0, 0, 0.3);
 }
 
-.btn-ver-artigo-modal:hover { 
-    background: #121212; /* Inverte para preto no hover */
-    box-shadow: 0 4px 0px #000;
-    transform: translateY(-2px);
+.btn-ver-artigo-modal:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(255, 0, 0, 0.5);
+    background: #ff1a1a;
 }
 
-/* Ajustes Mobile */
-@media (max-width: 768px) {
-    #modal-noticia-global .modal-content { padding: 40px 20px; margin: 0; border-radius: 0; }
-    #m-ficha { grid-template-columns: 1fr 1fr; gap: 20px; }
-    .btn-ver-artigo-modal { width: 100%; }
+/* Responsividade de Alta Performance */
+@media (max-width: 1100px) {
+    #modal-noticia-global .modal-content { flex-direction: column; height: 95vh; top: 2.5vh; transform: translate(-50%, 0); }
+    .modal-visual-side { flex: 0.8; }
+    .modal-info-side { padding: 30px; }
+    #m-resumo { -webkit-line-clamp: 3; }
 }

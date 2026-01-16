@@ -1,106 +1,190 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+    <meta name="56dec61931ebd1272f19e50443931bbff017f20b" content="56dec61931ebd1272f19e50443931bbff017f20b" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    <meta name="clckd" content="1ddd5f4727fa7a78e4747eb6a043ffbf" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AniGeekNews.com | Jornalismo Geek</title>
+    <title>AniGeekNews | Jornalismo Geek</title>
     <meta name="description" content="Jornalismo independente sobre cultura pop, animes, games e cinema.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Cormorant+Garamond:wght@400;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <link rel="stylesheet" href="estilos/geral.css">
     <link rel="stylesheet" href="estilos/cabecalho-rodape.css">
     <link rel="stylesheet" href="estilos/componentes.css">
-    
-    <link rel="stylesheet" href="estilos/modal-pesquisa.css">
 </head>
-
 <body>
+    
+    <div id="progress-bar"></div>
 
-<div id="progress-bar"></div>
-<div id="megaMenuContainer"></div>
-
-<div class="sticky-header-group">
-    <header>
-        <div class="nav-container">
-            <a href="./index.html" class="logo">AniGeeknews.com<span></span></a>
-            <ul class="nav-menu">
-                <li class="nav-item"><a href="#">Animes</a></li>
-                <li class="nav-item"><a href="#">Games</a></li>
-                <li class="nav-item"><a href="#">Mangás</a></li>
-                <li class="nav-item" id="area-usuario"><span>Aguardando...</span></li>
-            </ul>
-            <button class="menu-toggle" onclick="abrirMegaMenu()" aria-label="Abrir menu">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-    </header>
-
-    <div class="search-bar-wrapper">
-        <div class="search-box">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="input-busca-global" placeholder="Pesquisar notícias, animes ou análises..." autocomplete="off">
-        </div>
-        <div id="search-results-surface"></div>
-    </div>
-    <div class="filter-scroller" id="filterScroller"></div>
-</div>
-
-<main id="dynamic-content">
-    <section class="hero">
-        <div id="conteudo_de_destaque">
-            <p style="text-align:center; padding-top:100px; color:var(--text-muted);">Iniciando portal...</p>
-        </div>
-    </section>
-</main>
-
-<footer>
-    <div style="max-width:var(--container-w); margin:0 auto;">
-        <a href="./index.html" class="logo" style="font-size:20px;">AniGeek<span>News</span></a>
-        <p style="margin-top:10px;">© 2025 AniGeekNews. Jornalismo Geek Independente.</p>
-    </div>
-</footer>
-
-<script type="module" src="scripts/config-firebase.js"></script>
-<script type="module" src="scripts/auth.js"></script>
-<script type="module" src="scripts/tema.js"></script>
-<script type="module" src="scripts/navegacao.js"></script>
-<script type="module" src="scripts/busca.js"></script>
-<script src="scripts/recomendacao-secao.js"></script>
-
-<script type="module" src="scripts/modal-manager.js"></script>
-
-<script type="module">
-    import { inicializarMegaMenu } from './menu/menu.js';
-    inicializarMegaMenu();
-</script>
-
-<script>
-/* Lógica de estado do usuário mantida */
-(function () {
-    function aplicarEstadoUsuario(user) {
-        const areaUsuario = document.getElementById("area-usuario");
-        if (!areaUsuario) return;
-        if (user) {
-            areaUsuario.innerHTML = `
-                <div class="usuario-logado">
-                    <span class="usuario-nome">${user.nome || "Usuário"}</span>
-                    <button class="logout-btn" onclick="window.logoutAniGeek && window.logoutAniGeek()">
-                        <i class="fa-solid fa-right-from-bracket"></i>
+    <div class="sticky-header-group">
+        <header>
+            <div class="nav-container">
+                <a href="./index.html" class="logo">AniGeeknews.com<span></span></a>
+                <ul class="nav-menu">
+                    <li class="nav-item"><a href="#">Animes</a></li>
+                    <li class="nav-item"><a href="#">Games</a></li>
+                    <li class="nav-item"><a href="#">Mangás</a></li>
+                    <li class="nav-item" id="area-usuario"><span>Aguardando...</span></li>
+                </ul>
+                <div class="header-actions">
+                    <button class="sections-btn" onclick="toggleMobileMenu()">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
                     </button>
-                </div>`;
-        } else {
-            areaUsuario.innerHTML = `<a href="acesso.html" class="link-login">Entrar / Criar conta</a>`;
-        }
-    }
-    if (window.AniGeekUser !== undefined) aplicarEstadoUsuario(window.AniGeekUser);
-    document.addEventListener("user:login", (e) => aplicarEstadoUsuario(e.detail));
-    document.addEventListener("user:logout", () => aplicarEstadoUsuario(null));
-})();
-</script>
+                    <button class="menu-toggle" onclick="toggleMobileMenu()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
 
+        <div class="search-bar-wrapper">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="input-busca-global" placeholder="Pesquisar notícias, animes ou análises..." autocomplete="off">
+            </div>
+            <div id="search-results-surface"></div>
+        </div>
+
+        <!-- Filtros serão gerados dinamicamente pelo recomendacao-secao.js -->
+        <div class="filter-scroller" id="filterScroller">
+            <!-- As abas aparecerão aqui automaticamente -->
+        </div>
+    </div>
+
+    <main id="dynamic-content">
+        <section class="hero">
+            <div id="conteudo_de_destaque">
+                <p style="text-align: center; padding-top: 100px; color: var(--text-muted);">Iniciando portal...</p>
+            </div>
+        </section>
+
+        <div class="newsletter-card">
+            <h3>Briefing Matinal</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">Curadoria das notícias mais importantes.</p>
+            <input type="email" placeholder="seu@email.com" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid var(--border); background: var(--bg); color: var(--text-main);">
+            <button style="width: 100%; padding: 12px; background: var(--text-main); color: var(--bg); border: none; cursor: pointer; font-weight: bold;">ASSINAR BRIEFING</button>
+        </div>
+    </main>
+
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="close-menu" onclick="toggleMobileMenu()">×</button>
+        <div id="container-menu-perfil"></div>
+        <div class="mobile-menu-item"><a href="./index.html">Início</a></div>
+        <div class="mobile-menu-item"><a href="#">Animes</a></div>
+        <div class="mobile-menu-item"><a href="#">Games</a></div>
+        <div class="mobile-menu-item"><a href="#">Mangás</a></div>
+        <div class="theme-toggle-container" style="margin-top: 20px;">
+            <span id="mobileThemeLabel" style="font-weight: bold; font-size: 12px;">TEMA ESCURO</span>
+            <label class="theme-toggle">
+                <input type="checkbox" id="mobileThemeToggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <footer>
+        <div style="max-width: var(--container-w); margin: 0 auto;">
+            <a href="./index.html" class="logo" style="font-size: 20px;">AniGeek<span>News</span></a>
+            <p style="margin-top: 10px;">© 2025 AniGeekNews. Jornalismo Geek Independente.</p>
+        </div>
+    </footer>
+
+    <!-- Modal Global de Notícia (mantido intacto) -->
+    <div id="modal-noticia-global" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:99999; overflow-y:auto; backdrop-filter: blur(8px);">
+        <div id="modal-conteudo-interno" style="background: var(--bg, #fff); color: var(--text-main, #121212); max-width: 900px; margin: 20px auto; padding: 25px; border-radius: 12px; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+            <button onclick="window.fecharModalGlobal()" style="position: absolute; top: 15px; right: 15px; border: none; background: rgba(0,0,0,0.05); width: 35px; height: 35px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+            
+            <div id="m-categoria" style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;"></div>
+            <h2 id="m-titulo" style="font-size: clamp(22px, 5vw, 36px); font-weight: 850; margin: 0 0 15px 0; line-height: 1.2;"></h2>
+            <p id="m-resumo" style="font-size: 16px; line-height: 1.6; opacity: 0.8; margin-bottom: 20px;"></p>
+            
+            <div id="m-ficha" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; background: rgba(0,0,0,0.03); padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
+            
+            <iframe id="m-video" style="width: 100%; aspect-ratio: 16/9; border: none; border-radius: 8px;" allowfullscreen></iframe>
+            
+            <div style="margin-top: 25px; text-align: center;">
+                <a id="m-link" href="#" target="_blank" style="display: inline-block; padding: 12px 25px; background: var(--text-main); color: var(--bg); text-decoration: none; font-weight: 700; border-radius: 4px; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Ver Artigo Completo</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts principais -->
+    <script type="module" src="scripts/config-firebase.js"></script>
+    <script type="module" src="scripts/tema.js"></script>
+    <script type="module" src="scripts/navegacao.js"></script>
+    <script type="module" src="scripts/busca.js"></script>
+
+    <!-- Script de recomendação e gestão de seções (NOVO) -->
+    <script src="scripts/recomendacao-secao.js"></script>
+
+    <!-- Função global exigida pelo sistema -->
+    <script>
+        window.abrirModalNoticia = (noticia) => {
+            const modal = document.getElementById('modal-noticia-global');
+            if (!modal) return;
+
+            document.getElementById('m-categoria').innerText = noticia.categoria || "Geek";
+            document.getElementById('m-categoria').style.color = noticia.cor || "var(--primary)";
+            document.getElementById('m-titulo').innerText = noticia.titulo;
+            document.getElementById('m-resumo').innerText = noticia.resumo || "";
+            document.getElementById('m-video').src = noticia.videoPrincipal || "";
+            document.getElementById('m-link').href = noticia.linkArtigo || "#";
+
+            const fichaContainer = document.getElementById('m-ficha');
+            if (noticia.ficha && noticia.ficha.length > 0) {
+                fichaContainer.style.display = 'grid';
+                fichaContainer.innerHTML = noticia.ficha.map(item => `
+                    <div style="border-left: 3px solid ${noticia.cor || '#eee'}; padding-left: 10px;">
+                        <div style="font-size: 9px; text-transform: uppercase; font-weight: 800; opacity: 0.5;">${item.label}</div>
+                        <div style="font-size: 13px; font-weight: 700;">${item.valor}</div>
+                    </div>
+                `).join('');
+            } else {
+                fichaContainer.style.display = 'none';
+            }
+
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.fecharModalGlobal = () => {
+            const modal = document.getElementById('modal-noticia-global');
+            modal.style.display = 'none';
+            document.getElementById('m-video').src = "";
+            document.body.style.overflow = 'auto';
+            
+            const url = new URL(window.location);
+            url.searchParams.delete('id');
+            window.history.pushState({}, '', url);
+        };
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal-noticia-global');
+            if (event.target == modal) window.fecharModalGlobal();
+        };
+    </script>
+
+    <!-- Script externo (não alterado) -->
+    <script>
+    (function(law){
+    var d = document,
+        s = d.createElement('script'),
+        l = d.scripts[d.scripts.length - 1];
+    s.settings = law || {};
+    s.src = "\/\/piercing-flower.com\/bcXWV\/s.dVG\/l\/0KYuWac_\/ReTmU9muOZ\/U\/lCk\/PeTeYG3TNLDLgO0\/MKjwIktSNdjvc\/0\/OQDPQFyxMTwf";
+    s.async = true;
+    s.referrerPolicy = 'no-referrer-when-downgrade';
+    l.parentNode.insertBefore(s, l);
+    })({})
+    </script>
+    <script type="module" src="scripts/ads-industrial.js"></script>
 </body>
 </html>

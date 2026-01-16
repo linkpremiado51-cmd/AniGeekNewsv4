@@ -2,10 +2,9 @@
 
 const displayPrincipal = document.getElementById('conteudo_de_destaque');
 
-/**
- * Abre a notícia garantindo que o motor de renderização da seção seja injetado corretamente.
- * Utilizado para visualização em "página cheia" (Full Page View).
- */
+/* ======================================================
+   ABERTURA DE NOTÍCIA (PÁGINA CHEIA)
+====================================================== */
 async function abrirNoticiaUnica(item) {
     if (!displayPrincipal) return;
 
@@ -14,131 +13,131 @@ async function abrirNoticiaUnica(item) {
 
         displayPrincipal.innerHTML = `
             <div class="foco-noticia-wrapper" style="animation: fadeIn 0.4s ease; max-width: var(--container-w); margin: 0 auto; padding: 20px;">
-                <div class="barra-ferramentas-foco" style="display: flex; justify-content: flex-start; padding-bottom: 20px; border-bottom: 1px dashed var(--border); margin-bottom: 30px;">
-                    <button onclick="window.voltarParaLista()" class="btn-voltar-estilizado" style="background: none; border: 1px solid var(--text-main); color: var(--text-main); padding: 8px 18px; font-size: 10px; font-weight: 800; letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.3s; text-transform: uppercase;">
-                        <i class="fa-solid fa-chevron-left" style="font-size: 14px;"></i> 
+                <div class="barra-ferramentas-foco" style="display:flex; justify-content:flex-start; padding-bottom:20px; border-bottom:1px dashed var(--border); margin-bottom:30px;">
+                    <button onclick="window.voltarParaLista()" class="btn-voltar-estilizado"
+                        style="background:none; border:1px solid var(--text-main); color:var(--text-main);
+                        padding:8px 18px; font-size:10px; font-weight:800; letter-spacing:1px;
+                        cursor:pointer; display:flex; align-items:center; gap:12px; text-transform:uppercase;">
+                        <i class="fa-solid fa-chevron-left"></i>
                         <span>Voltar para ${item.origem ? item.origem.toUpperCase() : 'Início'}</span>
                     </button>
                 </div>
                 <div id="container-principal">
-                    <p style="text-align:center; padding:50px; color:var(--text-muted);">Carregando conteúdo...</p>
+                    <p style="text-align:center; padding:50px; color:var(--text-muted);">
+                        Carregando conteúdo...
+                    </p>
                 </div>
             </div>
         `;
 
         const response = await fetch(`./secoes/${item.origem || 'manchetes'}.html`);
-        if (!response.ok) throw new Error("Falha ao carregar motor de renderização.");
+        if (!response.ok) throw new Error("Falha ao carregar motor da seção.");
+
         const htmlBase = await response.text();
+        const doc = new DOMParser().parseFromString(htmlBase, 'text/html');
 
-        const parser = new DOMParser();
-        const docSeçao = parser.parseFromString(htmlBase, 'text/html');
-        const scripts = docSeçao.querySelectorAll("script");
+        doc.querySelectorAll("script").forEach(oldScript => {
+            const s = document.createElement("script");
+            s.type = oldScript.type || 'module';
 
-        scripts.forEach(oldScript => {
-            const newScript = document.createElement("script");
-            if (oldScript.type === 'module' || !oldScript.type) {
-                let conteudo = oldScript.textContent;
-                if (conteudo.includes('function renderizarNoticias')) {
-                    conteudo += `\n window.renderizarNoticias = renderizarNoticias;`;
-                }
-                newScript.type = 'module';
-                newScript.textContent = conteudo;
-            } else {
-                if (oldScript.src) newScript.src = oldScript.src;
-                newScript.textContent = oldScript.textContent;
+            let conteudo = oldScript.textContent;
+            if (conteudo.includes('function renderizarNoticias')) {
+                conteudo += `\nwindow.renderizarNoticias = renderizarNoticias;`;
             }
-            document.head.appendChild(newScript);
+
+            s.textContent = conteudo;
+            document.head.appendChild(s);
         });
 
         let tentativas = 0;
-        const tentarRenderizar = () => {
+        const aguardarRender = () => {
             if (typeof window.renderizarNoticias === 'function') {
-                const container = document.getElementById('container-principal');
-                if (container) container.innerHTML = "";
+                document.getElementById('container-principal').innerHTML = '';
                 window.renderizarNoticias([item]);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else if (tentativas < 20) {
-                tentativas++;
-                setTimeout(tentarRenderizar, 150);
+            } else if (tentativas++ < 20) {
+                setTimeout(aguardarRender, 150);
             }
         };
-        tentarRenderizar();
+        aguardarRender();
 
     } catch (err) {
-        console.error("Erro na ponte de navegação:", err);
-        displayPrincipal.innerHTML = `<div style="padding:100px; text-align:center;">Erro ao carregar conteúdo.</div>`;
+        console.error("Erro ao abrir notícia:", err);
+        displayPrincipal.innerHTML = `<div style="padding:100px;text-align:center;">Erro ao carregar conteúdo.</div>`;
     }
 }
 
-/**
- * Vigia de URL para Links Compartilhados (?id=...)
- */
+/* ======================================================
+   TRATAMENTO DE URL (?id=...)
+====================================================== */
 function verificarLinkCompartilhado() {
-    const params = new URLSearchParams(window.location.search);
-    const idNoticia = params.get('id');
+    const idNoticia = new URLSearchParams(window.location.search).get('id');
+    if (!idNoticia) return;
 
-    if (idNoticia) {
-        if (displayPrincipal) {
-            displayPrincipal.innerHTML = '<div style="text-align: center; padding: 120px; color: var(--text-muted); font-family: sans-serif; letter-spacing: 1px;">BUSCANDO NOTÍCIA...</div>';
-        }
-
-        const checkData = setInterval(() => {
-            if (window.noticiasFirebase && window.noticiasFirebase.length > 0) {
-                const item = window.noticiasFirebase.find(n => n.id === idNoticia);
-                if (item) {
-                    if (typeof window.abrirModalNoticia === 'function') {
-                        window.abrirModalNoticia(item);
-                        carregarSecao('manchetes', false);
-                    } else {
-                        abrirNoticiaUnica(item);
-                    }
-                } else {
-                    carregarSecao('manchetes', false);
-                }
-                clearInterval(checkData);
-            }
-        }, 100);
-
-        setTimeout(() => clearInterval(checkData), 5000);
+    if (displayPrincipal) {
+        displayPrincipal.innerHTML = `
+            <div style="text-align:center; padding:120px; color:var(--text-muted);">
+                BUSCANDO NOTÍCIA...
+            </div>`;
     }
+
+    const intervalo = setInterval(() => {
+        if (window.noticiasFirebase?.length) {
+            const item = window.noticiasFirebase.find(n => n.id === idNoticia);
+
+            if (item) {
+                if (typeof window.abrirModalNoticia === 'function') {
+                    window.abrirModalNoticia(item);
+                    carregarSecao('manchetes', false);
+                } else {
+                    abrirNoticiaUnica(item);
+                }
+            } else {
+                carregarSecao('manchetes', false);
+            }
+
+            clearInterval(intervalo);
+        }
+    }, 100);
+
+    setTimeout(() => clearInterval(intervalo), 5000);
 }
 
-/**
- * Limpa o ID da URL e restaura a visualização da lista
- */
-window.voltarParaLista = function() {
+/* ======================================================
+   VOLTAR PARA LISTA
+====================================================== */
+window.voltarParaLista = function () {
     const url = new URL(window.location);
     url.searchParams.delete('id');
     window.history.pushState({}, '', url);
 
-    const tagAtiva = document.querySelector('.filter-tag.active');
-    const secaoDestino = tagAtiva ? tagAtiva.dataset.section : 'manchetes';
-    
-    carregarSecao(secaoDestino);
+    const ativa = document.querySelector('.filter-tag.active');
+    carregarSecao(ativa?.dataset.section || 'manchetes');
 };
 
-/**
- * Gerencia o carregamento de CSS específico
- */
+/* ======================================================
+   CSS DINÂMICO
+====================================================== */
 function gerenciarCSSDaSecao(nome) {
-    const linkAntigo = document.getElementById('css-secao-dinamica');
-    if (linkAntigo) linkAntigo.remove();
+    document.getElementById('css-secao-dinamica')?.remove();
 
-    const novoLink = document.createElement('link');
-    novoLink.id = 'css-secao-dinamica';
-    novoLink.rel = 'stylesheet';
-    novoLink.href = `./estilos/secoes/${nome}.css`;
-    document.head.appendChild(novoLink);
+    const link = document.createElement('link');
+    link.id = 'css-secao-dinamica';
+    link.rel = 'stylesheet';
+    link.href = `./estilos/secoes/${nome}.css`;
+    document.head.appendChild(link);
 }
 
-/**
- * Carrega dinamicamente o feed de uma seção
- * 🔥 AGORA SUPORTA ?secao=
- */
+/* ======================================================
+   CARREGAMENTO DE SEÇÃO
+====================================================== */
 async function carregarSecao(nome, atualizarURL = true) {
     if (!displayPrincipal) return;
 
-    displayPrincipal.innerHTML = '<div style="text-align: center; padding: 120px; color: var(--text-muted); opacity: 0.5;">SINCRONIZANDO...</div>';
+    displayPrincipal.innerHTML = `
+        <div style="text-align:center; padding:120px; color:var(--text-muted); opacity:.6;">
+            SINCRONIZANDO...
+        </div>`;
 
     try {
         if (atualizarURL) {
@@ -151,28 +150,28 @@ async function carregarSecao(nome, atualizarURL = true) {
         gerenciarCSSDaSecao(nome);
 
         const response = await fetch(`./secoes/${nome}.html`);
-        if (!response.ok) throw new Error("Arquivo não encontrado.");
+        if (!response.ok) throw new Error();
 
-        const html = await response.text();
-        displayPrincipal.innerHTML = html;
+        displayPrincipal.innerHTML = await response.text();
 
-        const scripts = displayPrincipal.querySelectorAll("script");
-        scripts.forEach(oldScript => {
-            const newScript = document.createElement("script");
-            newScript.type = oldScript.type || "text/javascript";
-            if (oldScript.src) newScript.src = oldScript.src;
-            newScript.textContent = oldScript.textContent;
-            document.body.appendChild(newScript);
+        displayPrincipal.querySelectorAll("script").forEach(old => {
+            const s = document.createElement("script");
+            s.type = old.type || "text/javascript";
+            s.textContent = old.textContent;
+            if (old.src) s.src = old.src;
+            document.body.appendChild(s);
         });
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    } catch (err) {
-        displayPrincipal.innerHTML = `<div style="text-align:center; padding:100px;">Erro: ${nome} não carregado.</div>`;
+    } catch {
+        displayPrincipal.innerHTML = `<div style="padding:100px;text-align:center;">Erro ao carregar ${nome}.</div>`;
     }
 }
 
-// Eventos de clique nos filtros
+/* ======================================================
+   FILTROS
+====================================================== */
 document.querySelectorAll('.filter-tag').forEach(tag => {
     tag.addEventListener('click', () => {
         document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
@@ -181,22 +180,38 @@ document.querySelectorAll('.filter-tag').forEach(tag => {
     });
 });
 
-// Inicialização
+/* ======================================================
+   INICIALIZAÇÃO
+====================================================== */
 window.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
 
     if (params.has('id')) {
         verificarLinkCompartilhado();
-        return;
-    }
-
-    if (params.has('secao')) {
+    } else if (params.has('secao')) {
         carregarSecao(params.get('secao'), false);
     } else {
         carregarSecao('manchetes', false);
     }
 });
 
-// Exposição global
+/* ======================================================
+   🔥 CORREÇÃO CRÍTICA: PUSHSTATE / BUSCA / BACK
+====================================================== */
+window.addEventListener('popstate', () => {
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.has('id')) {
+        verificarLinkCompartilhado();
+    } else if (params.has('secao')) {
+        carregarSecao(params.get('secao'), false);
+    } else {
+        carregarSecao('manchetes', false);
+    }
+});
+
+/* ======================================================
+   EXPOSIÇÃO GLOBAL
+====================================================== */
 window.carregarSecao = carregarSecao;
 window.abrirNoticiaUnica = abrirNoticiaUnica;
